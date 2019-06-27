@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
 
 import DateUtil from '../util/DateUtil';
@@ -8,7 +8,12 @@ import Measurements from '../util/Measurements';
 const DayCell = styled.div`
   grid-column-start: ${props => props.weekday || 'auto'};
   grid-column-end: span 1;
-  background-color: ${props => (['saturday', 'sunday'].includes(props.weekday) || props.holiday ? Colors.helgdag : Colors.vardag)};
+  background-color: ${props => {
+    if (props.workedHoliday) { return Colors.arbetadHelgdag; }
+    else if (todayIsOff(props.weekday, props.holiday)) { return Colors.helgdag; }
+    else if (props.vacationing) { return Colors.semester; }
+    else { return Colors.vardag; }
+  }};
   ${props => {
     if (props.month === 11) { return ''; }
     if (props.date === DateUtil.lengthOfMonth(props.month, props.year) && props.weekday !== 'sunday') {
@@ -36,16 +41,59 @@ const DayCell = styled.div`
     margin: 5px 0 0 0;
     font-size: 0.8rem;
     color: #444;
+    ${props => props.workedHoliday ? 'text-decoration: line-through;' : '' }
   }
 `;
 
+function todayIsOff(weekday, holiday) {
+  return todayIsTheWeekend(weekday) || holiday;
+}
+
+function todayIsTheWeekend(weekday) {
+  return ['saturday', 'sunday'].includes(weekday);
+}
+
 function Day(props) {
+  const [vacationing, setVacationing] = useState(false);
+  const [workedHoliday, setWorkedHoliday] = useState(false);
+
+  const weekday = DateUtil.weekdayNameFromDate(props.day).toLowerCase()
+
+  function toggleTodayOff() {
+    if (todayIsTheWeekend(weekday)) {
+      return false;
+    }
+
+    if (props.holiday) {
+      if (!workedHoliday) {
+        props.useVacationDays(-1);
+        setWorkedHoliday(true);
+      } else {
+        if (props.useVacationDays(1)) {
+          setWorkedHoliday(false);
+        }
+      }
+      return;
+    }
+
+    if (!vacationing) {
+      if (props.useVacationDays(1)) {
+        setVacationing(true);
+      }
+    } else {
+      props.useVacationDays(-1);
+      setVacationing(false);
+    }
+  }
   return (
     <DayCell
-      weekday={DateUtil.weekdayNameFromDate(props.day).toLowerCase()}
+      weekday={weekday}
       month={props.day.getUTCMonth()}
       date={props.day.getUTCDate()}
       year={props.day.getUTCFullYear()}
+      vacationing={vacationing}
+      workedHoliday={workedHoliday}
+      onClick={() => toggleTodayOff()}
       {...props}
     >
       <p className="date">{props.day.getUTCDate()}</p>
