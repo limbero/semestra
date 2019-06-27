@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import DateUtil from '../util/DateUtil';
@@ -54,35 +54,17 @@ function todayIsTheWeekend(weekday) {
 }
 
 function Day(props) {
-  const [vacationing, setVacationing] = useState(false);
-  const [workedHoliday, setWorkedHoliday] = useState(false);
+  const weekday = DateUtil.weekdayNameFromDate(props.day).toLowerCase();
+  const mmdd = DateUtil.dateStringMMDD(props.day);
 
-  const weekday = DateUtil.weekdayNameFromDate(props.day).toLowerCase()
-
-  function toggleTodayOff() {
+  function toggleToday() {
     if (todayIsTheWeekend(weekday)) {
       return false;
-    }
-
-    if (props.holiday) {
-      if (!workedHoliday) {
-        props.workHoliday(DateUtil.dateStringMMDD(props.day), true)
-        setWorkedHoliday(true);
-      } else {
-        if (props.workHoliday(DateUtil.dateStringMMDD(props.day), false)) {
-          setWorkedHoliday(false);
-        }
-      }
-      return;
-    }
-
-    if (!vacationing) {
-      if (props.takeDayOff(DateUtil.dateStringMMDD(props.day), true)) {
-        setVacationing(true);
-      }
+    } else if (props.holiday) {
+      
+      props.toggleWorkedHoliday(mmdd);
     } else {
-      props.takeDayOff(DateUtil.dateStringMMDD(props.day), false);
-      setVacationing(false);
+      props.toggleDayOff(mmdd);
     }
   }
   return (
@@ -91,13 +73,13 @@ function Day(props) {
       month={props.day.getUTCMonth()}
       date={props.day.getUTCDate()}
       year={props.day.getUTCFullYear()}
-      vacationing={vacationing}
-      workedHoliday={workedHoliday}
-      onClick={() => toggleTodayOff()}
+      vacationing={props.vacationing}
+      workedHoliday={props.workedHoliday}
+      onClick={() => toggleToday()}
       {...props}
     >
-      <p className="date">{props.day.getUTCDate()}</p>
-      <p className="holiday">{props.holiday}</p>
+      <p className='date'>{props.day.getUTCDate()}</p>
+      <p className='holiday'>{props.holiday}</p>
     </DayCell>
   );
 }

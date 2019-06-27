@@ -3,26 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { Provider } from 'react-redux';
-import configureStore from './store/store'; // see store.js in the gist below
-import { BrowserRouter } from 'react-router-dom';
-
-const store = configureStore();
 
 const render = Component => {
   return ReactDOM.render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <Component />
-      </BrowserRouter>
-    </Provider>,
+    <Component />,
     document.getElementById('root')
   );
 };
 
 render(App);
-
-
 
 if (module.hot) {
   module.hot.accept('./App', () => {

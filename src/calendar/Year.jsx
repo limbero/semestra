@@ -43,14 +43,19 @@ function Year(props) {
     <YearGrid>
       <Weekdays />
       { 
-        days.map(day => (
-          <Day
-            key={DateUtil.dateStringYYYYMMDD(day)}
-            day={day}
-            holiday={props.holidays[DateUtil.dateStringMMDD(day)] || ""}
-            {...props}
-          />
-        ))
+        days.map(day => {
+          const mmdd = DateUtil.dateStringMMDD(day);
+          return (
+            <Day
+              key={DateUtil.dateStringYYYYMMDD(day)}
+              day={day}
+              holiday={props.holidays[mmdd] || ''}
+              vacationing={props.vacationDays.includes(mmdd)}
+              workedHoliday={props.workedHolidays.includes(mmdd)}
+              {...props}
+            />
+          );
+        })
       }
       <Months year={props.year} />
     </YearGrid>
