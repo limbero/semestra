@@ -19,8 +19,10 @@ class DateUtil {
     return `${this.fullDateTimeString(date, 'T') }Z`;
   }
   static dateStringYYYYMMDD(date, separator = '-') {
-    let dateString = date.getUTCFullYear() + separator;
-    dateString += this.zeropad(date.getUTCMonth() + 1, 2) + separator;
+    return date.getUTCFullYear() + separator + this.dateStringMMDD(date, separator);
+  }
+  static dateStringMMDD(date, separator = '-') {
+    let dateString = this.zeropad(date.getUTCMonth() + 1, 2) + separator;
     dateString += this.zeropad(date.getUTCDate(), 2);
     return dateString;
   }

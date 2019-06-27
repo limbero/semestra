@@ -44,7 +44,11 @@ function Year(props) {
       <Weekdays />
       { 
         days.map(day => (
-          <Day key={DateUtil.dateStringYYYYMMDD(day)} day={day} />
+          <Day
+            key={DateUtil.dateStringYYYYMMDD(day)}
+            day={day}
+            holiday={props.holidays[DateUtil.dateStringMMDD(day)] || ""}
+          />
         ))
       }
       <Months year={props.year} />

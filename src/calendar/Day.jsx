@@ -8,7 +8,7 @@ import Measurements from '../util/Measurements';
 const DayCell = styled.div`
   grid-column-start: ${props => props.weekday || 'auto'};
   grid-column-end: span 1;
-  background-color: ${props => (['saturday', 'sunday'].includes(props.weekday) ? Colors.helgdag : Colors.vardag)};
+  background-color: ${props => (['saturday', 'sunday'].includes(props.weekday) || props.holiday ? Colors.helgdag : Colors.vardag)};
   ${props => {
     if (props.month === 11) { return ''; }
     if (props.date === DateUtil.lengthOfMonth(props.month, props.year) && props.weekday !== 'sunday') {
@@ -28,6 +28,15 @@ const DayCell = styled.div`
   height: 75px;
   padding: 7px;
   border-radius: 5px;
+
+  p.date {
+    margin: 0;
+  }
+  p.holiday {
+    margin: 5px 0 0 0;
+    font-size: 0.8rem;
+    color: #444;
+  }
 `;
 
 function Day(props) {
@@ -37,8 +46,10 @@ function Day(props) {
       month={props.day.getUTCMonth()}
       date={props.day.getUTCDate()}
       year={props.day.getUTCFullYear()}
+      {...props}
     >
-      {props.day.getUTCDate()}
+      <p className="date">{props.day.getUTCDate()}</p>
+      <p className="holiday">{props.holiday}</p>
     </DayCell>
   );
 }
