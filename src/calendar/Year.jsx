@@ -48,7 +48,7 @@ function Year(props) {
             key={DateUtil.dateStringYYYYMMDD(day)}
             day={day}
             holiday={props.holidays[DateUtil.dateStringMMDD(day)] || ""}
-            useVacationDays={props.useVacationDays}
+            {...props}
           />
         ))
       }

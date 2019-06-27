@@ -66,10 +66,10 @@ function Day(props) {
 
     if (props.holiday) {
       if (!workedHoliday) {
-        props.useVacationDays(-1);
+        props.workHoliday(DateUtil.dateStringMMDD(props.day), true)
         setWorkedHoliday(true);
       } else {
-        if (props.useVacationDays(1)) {
+        if (props.workHoliday(DateUtil.dateStringMMDD(props.day), false)) {
           setWorkedHoliday(false);
         }
       }
@@ -77,11 +77,11 @@ function Day(props) {
     }
 
     if (!vacationing) {
-      if (props.useVacationDays(1)) {
+      if (props.takeDayOff(DateUtil.dateStringMMDD(props.day), true)) {
         setVacationing(true);
       }
     } else {
-      props.useVacationDays(-1);
+      props.takeDayOff(DateUtil.dateStringMMDD(props.day), false);
       setVacationing(false);
     }
   }
