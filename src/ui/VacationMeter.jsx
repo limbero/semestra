@@ -20,7 +20,7 @@ const VacationMeterItem = styled.div`
 function VacationMeter(props) {
   return (
     <VacationMeterItem>
-      <strong>Vacation days left:</strong> {props.vacationDaysLeft}
+      <strong>Vacation days left:</strong> {props.vacationDaysLeft}/{props.numVacationDays}
     </VacationMeterItem>
   );
 }
