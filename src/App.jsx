@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import holidays from './data/holidays';
+import vacation_allotment from './data/vacation_allotment';
 
 import Spreads from './util/Spreads';
 
@@ -24,11 +25,11 @@ const Title = styled.h1`
   margin: 1rem 0;
 `;
 
-const YearNav = styled.nav`
+const Picker = styled.nav`
   margin: 20px 0;
 `;
 
-const YearBtn = styled.button`
+const PickerBtn = styled.button`
   background: none;
   border: none;
 
@@ -42,7 +43,8 @@ const YearBtn = styled.button`
   border-radius: 3px;
 
   &:disabled {
-    color: var(--text-color);
+    background-color: var(--text-color);
+    color: var(--background-color);
   }
 
   &:first-child {
@@ -63,14 +65,14 @@ const YearBtn = styled.button`
   }
 `;
 
-function YearButton(props) {
+function PickerButton(props) {
   return (
-    <YearBtn
-      disabled={props.year === props.currentYear}
-      onClick={() => props.setYear(props.year)}
+    <PickerBtn
+      disabled={props.value === props.currentlyPicked}
+      onClick={() => props.pick(props.value)}
     >
-      {props.year}
-    </YearBtn>
+      {props.children}
+    </PickerBtn>
   );
 }
 
@@ -78,47 +80,84 @@ function App() {
   const years = [2019, 2020];
   const [activeYear, setYear] = useLocalStorage('semestra-year', 2019);
 
-  const empty = {};
-  years.forEach(year => empty[`${year}`] = []);
+  const locations = ['boston', 'uk', 'sweden'];
+  const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
 
-  const numVacationDays = 23;
+  const empty = {};
+  locations.forEach(loc => {
+    empty[loc] = {};
+    years.forEach(year => empty[loc][`${year}`] = []);
+  });
+
+  const [numVacationDays, setNumVacationDays] = useLocalStorage('semestra-vacationAllotment', vacation_allotment);
   const [vacationDays, setVacationDays] = useLocalStorage('semestra-vacationDays', empty);
   const [workedHolidays, setWorkedHolidays] = useLocalStorage('semestra-workedHolidays', empty);
 
-  function thereAreDaysLeftOff() {
-    return numVacationDaysLeft() > 0;
-  }
-
-  function numVacationDaysLeft() {
-    return numVacationDays - vacationDays[activeYear].length + workedHolidays[activeYear].length;
-  }
-
-  function toggleDayOff(mmdd) {
-    if (vacationDays[activeYear].includes(mmdd)) {
-      setVacationDays({
-        ...vacationDays,
-        [activeYear]: Spreads.removeFromArray(vacationDays[activeYear], mmdd)
-      });
-    } else if (thereAreDaysLeftOff()) {
-      setVacationDays({
-        ...vacationDays,
-        [activeYear]: Spreads.addToArray(vacationDays[activeYear], mmdd)
-      });
+  function changeNumVacationDays(newNum) {
+    if (thereAreDaysLeftOff(newNum) + 1) {
+      setNumVacationDays(
+        {
+          ...numVacationDays,
+          [location]: newNum,
+        }
+      );
     }
   }
 
+  function addNumVacationDays(num) {
+    changeNumVacationDays(numVacationDays[location] + num);
+  }
+
+  function thereAreDaysLeftOff(from = numVacationDays[location]) {
+    return numVacationDaysLeft(from) > 0;
+  }
+
+  function numVacationDaysLeft(from = numVacationDays[location]) {
+    return from - vacationDays[location][activeYear].length + workedHolidays[location][activeYear].length;
+  }
+
+  function toggleDayOff(mmdd) {
+    if (vacationDays[location][activeYear].includes(mmdd)) {
+      setVacationDaysHelper(Spreads.removeFromArray(vacationDays[location][activeYear], mmdd));
+    } else if (thereAreDaysLeftOff()) {
+      setVacationDaysHelper(Spreads.addToArray(vacationDays[location][activeYear], mmdd));
+    }
+  }
+
+  function setVacationDaysHelper(days) {
+    doFunctionForNestedState(vacationDays, setVacationDays, location, activeYear, days);
+  }
+
+  function setWorkedHolidaysHelper(days) {
+    doFunctionForNestedState(workedHolidays, setWorkedHolidays, location, activeYear, days);
+  }
+
+  function doFunctionForNestedState(obj, fun, loc, yr, days) {
+    fun({
+      ...obj,
+      [loc]: {
+        ...obj[loc],
+        [yr]: days,
+      },
+    });
+  }
+
   function toggleWorkedHoliday(mmdd) {
-    if (workedHolidays[activeYear].includes(mmdd)) {
+    if (workedHolidays[location][activeYear].includes(mmdd)) {
       if (!thereAreDaysLeftOff()) { return; }
-      setWorkedHolidays({
-        ...workedHolidays,
-        [activeYear]: Spreads.removeFromArray(workedHolidays[activeYear], mmdd)
-      });
+      setWorkedHolidaysHelper(
+        Spreads.removeFromArray(
+          workedHolidays[location][activeYear],
+          mmdd
+        )
+      );
     } else {
-      setWorkedHolidays({
-        ...workedHolidays,
-        [activeYear]: Spreads.addToArray(workedHolidays[activeYear], mmdd)
-      });
+      setWorkedHolidaysHelper(
+        Spreads.addToArray(
+          workedHolidays[location][activeYear],
+          mmdd
+        )
+      );
     }
   }
   
@@ -126,22 +165,31 @@ function App() {
     <Wrapper>
       <Title>semestra</Title>
       <div style={{ textAlign: 'right' }}>
-        <VacationMeter vacationDaysLeft={numVacationDaysLeft()} numVacationDays={numVacationDays} />
+        <VacationMeter vacationDaysLeft={numVacationDaysLeft()} numVacationDays={numVacationDays[location]} addNumVacationDays={addNumVacationDays} />
       </div>
-      <YearNav>
+      <Picker>
         {
           years.map(year => (
-            <YearButton year={year} currentYear={activeYear} setYear={setYear} />
+            <PickerButton key={year} value={year} currentlyPicked={activeYear} pick={setYear}>{year}</PickerButton>
           ))
         }
-      </YearNav>
+      </Picker>
+      <Picker>
+        {
+          locations.map(loc => (
+            <PickerButton key={loc} value={loc} currentlyPicked={location} pick={setLocation}>
+              <img alt={loc} style={{display:'block'}} height={32} src={`/icons/${loc}.png`} />
+            </PickerButton>
+          ))
+        }
+      </Picker>
       <Year
         year={activeYear}
-        holidays={holidays[`${activeYear}`]['boston']}
+        holidays={holidays[`${activeYear}`][location]}
         toggleDayOff={toggleDayOff}
         toggleWorkedHoliday={toggleWorkedHoliday}
-        vacationDays={vacationDays[activeYear] || []}
-        workedHolidays={workedHolidays[activeYear] || []}
+        vacationDays={vacationDays[location][activeYear] || []}
+        workedHolidays={workedHolidays[location][activeYear] || []}
       />
     </Wrapper>
   );

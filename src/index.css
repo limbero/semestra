@@ -21,6 +21,9 @@ body {
   --year-background: #111;
   --inactive: #666;
 
+  --red: var(--helgdag);
+  --green: var(--arbetad-helgdag);
+
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -39,6 +42,9 @@ body {
     --text-color-secondary: #444;
     --year-background: #EEE;
     --inactive: #BBB;
+
+    --red: var(--helgdag);
+    --green: var(--arbetad-helgdag);
   }
 }
 

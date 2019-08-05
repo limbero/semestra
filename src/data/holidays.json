@@ -14,6 +14,30 @@
       "11-29": "Day After Thanksgiving",
       "12-24": "Christmas Eve",
       "12-25": "Christmas Day"
+    },
+    "uk": {
+      "01-01": "New Year's Day",
+      "04-19": "Good Friday",
+      "04-22": "Easter Monday",
+      "05-06": "Early May bank holiday",
+      "05-27": "Spring bank holiday",
+      "08-26": "Summer bank holiday",
+      "12-25": "Christmas Day",
+      "12-26": "Boxing Day"
+    },
+    "sweden": {
+      "01-01": "Nyårsdagen",
+      "01-06": "Trettondedag jul",
+      "04-19": "Långfredagen",
+      "04-22": "Annandag påsk",
+      "05-01": "Första maj",
+      "05-30": "Kristi himmelsfärdsdag",
+      "06-06": "Nationaldagen",
+      "06-21": "Midsommarafton",
+      "12-24": "Julafton",
+      "12-25": "Juldagen",
+      "12-26": "Annandag jul",
+      "12-31": "Nyårsafton"
     }
   },
   "2020": {
@@ -31,6 +55,30 @@
       "11-27": "Day After Thanksgiving",
       "12-24": "Christmas Eve",
       "12-25": "Christmas Day"
+    },
+    "uk": {
+      "01-01": "New Year's Day",
+      "04-10": "Good Friday",
+      "04-13": "Easter Monday",
+      "05-08": "Early May bank holiday (VE day)",
+      "05-25": "Spring bank holiday",
+      "08-31": "Summer bank holiday",
+      "12-25": "Christmas Day",
+      "12-28": "Boxing Day (substitute day)"
+    },
+    "sweden": {
+      "01-01": "Nyårsdagen",
+      "01-06": "Trettondedag jul",
+      "04-10": "Långfredagen",
+      "04-13": "Annandag påsk",
+      "05-01": "Första maj",
+      "05-21": "Kristi himmelsfärdsdag",
+      "06-06": "Nationaldagen",
+      "06-19": "Midsommarafton",
+      "12-24": "Julafton",
+      "12-25": "Juldagen",
+      "12-26": "Annandag jul",
+      "12-31": "Nyårsafton"
     }
   }
 }
