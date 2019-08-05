@@ -27,7 +27,7 @@ const YearGrid = styled.div`
                           [sunday]    3fr;
 
   grid-gap: ${Measurements.year.padding}px;
-  background-color: #EEE;
+  background-color: var(--year-background);
   border-radius: ${Measurements.year.borderRadius}px;
 `;
 

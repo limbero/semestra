@@ -2,29 +2,28 @@ import React from 'react';
 import styled from 'styled-components';
 
 import DateUtil from '../util/DateUtil';
-import Colors from '../util/Colors';
 import Measurements from '../util/Measurements';
 
 const DayCell = styled.div`
   grid-column-start: ${props => props.weekday || 'auto'};
   grid-column-end: span 1;
   background-color: ${props => {
-    if (props.workedHoliday) { return Colors.arbetadHelgdag; }
-    else if (todayIsOff(props.weekday, props.holiday)) { return Colors.helgdag; }
-    else if (props.vacationing) { return Colors.semester; }
-    else { return Colors.vardag; }
+    if (props.workedHoliday) { return 'var(--arbetad-helgdag)'; }
+    else if (todayIsOff(props.weekday, props.holiday)) { return 'var(--helgdag)'; }
+    else if (props.vacationing) { return 'var(--semester)'; }
+    else { return 'var(--vardag)'; }
   }};
   ${props => {
     if (props.month === 11) { return ''; }
     if (props.date === DateUtil.lengthOfMonth(props.month, props.year) && props.weekday !== 'sunday') {
       return (
-        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px ${Colors.monthDivider}, ` +
-        `${Measurements.year.padding*4}px 0 0 -${Measurements.year.borderRadius*5}px ${Colors.monthDivider};`
+        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider), ` +
+        `${Measurements.year.padding*4}px 0 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
       );
     }
     if (DateUtil.lengthOfMonth(props.month, props.year) - props.date < 7) {
       return (
-        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px ${Colors.monthDivider};`
+        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
       );
     }
   }}
@@ -40,7 +39,7 @@ const DayCell = styled.div`
   p.holiday {
     margin: 5px 0 0 0;
     font-size: 0.8rem;
-    color: #444;
+    color: var(--text-color-secondary);
     ${props => props.workedHoliday ? 'text-decoration: line-through;' : '' }
   }
 `;

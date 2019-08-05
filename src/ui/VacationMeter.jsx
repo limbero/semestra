@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const VacationMeterItem = styled.div`
-  background-color: #FAFAFA;
+  background-color: var(--year-background);
 
   display: inline;
   box-sizing: border-box;

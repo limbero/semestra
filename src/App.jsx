@@ -8,11 +8,14 @@ import Spreads from './util/Spreads';
 import Year from './calendar/Year';
 import VacationMeter from './ui/VacationMeter';
 
+
 const Wrapper = styled.div`
   margin: 0 auto;
   width: 70vw;
   max-width: 900px;
   min-width: 600px;
+  background-color: var(--background-color);
+  color: var(--text-color);
 `;
 
 const Title = styled.h1`
@@ -34,12 +37,12 @@ const YearBtn = styled.button`
 
   font-size: 1.5rem;
   font-weight: bold;
-  color: #BBB;
+  color: var(--inactive);
 
   border-radius: 3px;
 
   &:disabled {
-    color: #000;
+    color: var(--text-color);
   }
 
   &:first-child {

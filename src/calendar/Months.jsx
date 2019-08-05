@@ -34,7 +34,7 @@ const Month = styled.div`
 
   writing-mode: vertical-rl;
   text-orientation: mixed;
-letter-spacing: ${props => 30 * props.spanRows / props.month.length}px;
+  letter-spacing: ${props => 30 * props.spanRows / props.month.length}px;
   line-height: 100%;
 `;
 

@@ -7,6 +7,42 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --vardag: #222;
+  --helgdag: rgb(117, 39, 39);
+  --semester: rgb(126, 100, 31);
+  --arbetad-helgdag: rgb(65, 107, 65);
+
+  --month-divider: #666;
+
+  --background-color: #222;
+  --text-color: #FFF;
+  --text-color-secondary: #CCC;
+  --year-background: #111;
+  --inactive: #666;
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --vardag: #FFF;
+    --helgdag: #FDD;
+    --semester: #FFD;
+    --arbetad-helgdag: #DFD;
+
+    --month-divider: #666;
+
+    --background-color: #FFF;
+    --text-color: #000;
+    --text-color-secondary: #444;
+    --year-background: #EEE;
+    --inactive: #BBB;
+  }
+}
+
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
