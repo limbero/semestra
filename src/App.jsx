@@ -76,6 +76,27 @@ function PickerButton(props) {
   );
 }
 
+const years = ['2019', '2020'];
+const locations = ['boston', 'uk', 'sweden'];
+function yearsInLocs(thing) {
+  const obj = {};
+  locations.forEach(loc => {
+    obj[loc] = {};
+    years.forEach(yr => {
+      obj[loc][yr] = thing;
+    });
+  });
+  return obj;
+}
+
+const schemaShapes = {
+  'semestra-year': 0,
+  'semestra-location': '',
+  'semestra-vacationAllotment': yearsInLocs(0),
+  'semestra-vacationDays': yearsInLocs([]),
+  'semestra-workedHolidays': yearsInLocs([]),
+};
+
 function App() {
   const years = [2019, 2020];
   const [activeYear, setYear] = useLocalStorage('semestra-year', 2019);
@@ -83,36 +104,48 @@ function App() {
   const locations = ['boston', 'uk', 'sweden'];
   const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
 
-  const empty = {};
-  locations.forEach(loc => {
-    empty[loc] = {};
-    years.forEach(year => empty[loc][`${year}`] = []);
-  });
+  function empty(filler) {
+    const empty = {};
+    locations.forEach(loc => {
+      empty[loc] = {};
+      years.forEach(year => {
+        let val = filler;
+        if (typeof filler === 'function') {
+          val = filler(loc, year);
+        }
+        empty[loc][`${year}`] = val;
+      });
+    });
+    return empty;
+  }
 
-  const [numVacationDays, setNumVacationDays] = useLocalStorage('semestra-vacationAllotment', vacation_allotment);
-  const [vacationDays, setVacationDays] = useLocalStorage('semestra-vacationDays', empty);
-  const [workedHolidays, setWorkedHolidays] = useLocalStorage('semestra-workedHolidays', empty);
+  const [numVacationDays, setNumVacationDays] = useLocalStorage('semestra-vacationAllotment', empty((loc, yr) => vacation_allotment[loc]));
+  const [vacationDays, setVacationDays] = useLocalStorage('semestra-vacationDays', empty([]));
+  const [workedHolidays, setWorkedHolidays] = useLocalStorage('semestra-workedHolidays', empty([]));
 
   function changeNumVacationDays(newNum) {
     if (thereAreDaysLeftOff(newNum) + 1) {
       setNumVacationDays(
         {
           ...numVacationDays,
-          [location]: newNum,
+          [location]: {
+            ...numVacationDays[location],
+            [activeYear]: newNum,
+          },
         }
       );
     }
   }
 
   function addNumVacationDays(num) {
-    changeNumVacationDays(numVacationDays[location] + num);
+    changeNumVacationDays(numVacationDays[location][activeYear] + num);
   }
 
-  function thereAreDaysLeftOff(from = numVacationDays[location]) {
+  function thereAreDaysLeftOff(from = numVacationDays[location][activeYear]) {
     return numVacationDaysLeft(from) > 0;
   }
 
-  function numVacationDaysLeft(from = numVacationDays[location]) {
+  function numVacationDaysLeft(from = numVacationDays[location][activeYear]) {
     return from - vacationDays[location][activeYear].length + workedHolidays[location][activeYear].length;
   }
 
@@ -165,7 +198,7 @@ function App() {
     <Wrapper>
       <Title>semestra</Title>
       <div style={{ textAlign: 'right' }}>
-        <VacationMeter vacationDaysLeft={numVacationDaysLeft()} numVacationDays={numVacationDays[location]} addNumVacationDays={addNumVacationDays} />
+        <VacationMeter vacationDaysLeft={numVacationDaysLeft()} numVacationDays={numVacationDays[location][activeYear]} addNumVacationDays={addNumVacationDays} />
       </div>
       <Picker>
         {
@@ -195,6 +228,39 @@ function App() {
   );
 }
 
+function shapeMatches(obj, match) {
+  if (!obj) {
+    return true;
+  } else if (typeof obj !== typeof match) {
+    return false;
+  } else if (Array.isArray(obj)) {
+    if (!Array.isArray(match)) {
+      return false;
+    } else if (obj.length !== match.length) {
+      return false;
+    }
+    for (let i=0; i < obj.length; i++) {
+      if (!shapeMatches(obj[i], match[i])) {
+        return false;
+      }
+    }
+  }
+  const oks = Object.keys(obj);
+  const mks = Object.keys(obj);
+
+  if (oks.length > mks.length) {
+    return false;
+  }
+  for (let k=0; k < oks.length; k++) {
+    if (!mks.includes(oks[k])) {
+      return false;
+    } else {
+      return shapeMatches(obj[oks[k]], match[mks[k]]);
+    }
+  }
+  return true;
+}
+
 // Hook
 function useLocalStorage(key, initialValue) {
   // State to store our value
@@ -202,9 +268,12 @@ function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
     try {
       // Get from local storage by key
-      const item = window.localStorage.getItem(key);
-      // Parse stored json or if none return initialValue
-      return item ? JSON.parse(item) : initialValue;
+      const item = JSON.parse(window.localStorage.getItem(key));
+      if (item && shapeMatches(item, schemaShapes[key])) {
+        return item;
+      } else {
+        return initialValue;
+      }
     } catch (error) {
       // If error also return initialValue
       console.log(error);
