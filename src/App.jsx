@@ -90,9 +90,9 @@ function yearsInLocs(thing) {
 }
 
 const schemaShapes = {
-  'semestra-year': 0,
-  'semestra-location': '',
-  'semestra-vacationAllotment': yearsInLocs(0),
+  'semestra-year': 5,
+  'semestra-location': 'someplace',
+  'semestra-vacationAllotment': yearsInLocs(5),
   'semestra-vacationDays': yearsInLocs([]),
   'semestra-workedHolidays': yearsInLocs([]),
 };
@@ -244,18 +244,19 @@ function shapeMatches(obj, match) {
         return false;
       }
     }
-  }
-  const oks = Object.keys(obj);
-  const mks = Object.keys(obj);
+  } else if (typeof obj === 'object') {
+    const oks = Object.keys(obj);
+    const mks = Object.keys(obj);
 
-  if (oks.length > mks.length) {
-    return false;
-  }
-  for (let k=0; k < oks.length; k++) {
-    if (!mks.includes(oks[k])) {
+    if (oks.length > mks.length) {
       return false;
-    } else {
-      return shapeMatches(obj[oks[k]], match[mks[k]]);
+    }
+    for (let k=0; k < oks.length; k++) {
+      if (!mks.includes(oks[k])) {
+        return false;
+      } else {
+        return shapeMatches(obj[oks[k]], match[mks[k]]);
+      }
     }
   }
   return true;
