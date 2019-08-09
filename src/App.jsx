@@ -236,10 +236,8 @@ function shapeMatches(obj, match) {
   } else if (Array.isArray(obj)) {
     if (!Array.isArray(match)) {
       return false;
-    } else if (obj.length !== match.length) {
-      return false;
     }
-    for (let i=0; i < obj.length; i++) {
+    for (let i=0; i < match.length; i++) {
       if (!shapeMatches(obj[i], match[i])) {
         return false;
       }
