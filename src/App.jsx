@@ -20,6 +20,10 @@ const Wrapper = styled.div`
   color: var(--text-color);
 `;
 
+const IOControls = styled.div`
+  margin: 20px 0;
+`;
+
 const Title = styled.h1`
   font-family: monospace;
   font-size: 4rem;
@@ -194,6 +198,20 @@ function App() {
       );
     }
   }
+
+  function handleStateUpload(event) {
+    let reader = new FileReader();
+    reader.onerror = (error) => {
+      alert(error);
+    }
+    reader.onload = (data) => {
+      const uploadedState = JSON.parse(data.target.result);
+      setNumVacationDays(uploadedState.numVacationDays);
+      setVacationDays(uploadedState.vacationDays);
+      setWorkedHolidays(uploadedState.workedHolidays);
+    }
+    reader.readAsText(event.target.files[0]);
+  }
   
   return (
     <Wrapper>
@@ -217,12 +235,18 @@ function App() {
           ))
         }
       </Picker>
-      <DownloadLink
-        filename="semestra-vacation-plans.json"
-        exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
-      >
-        Save to disk
-      </DownloadLink>
+      <IOControls>
+        <label htmlFor='downloadInput'>Save to disk&nbsp;</label>
+        <DownloadLink
+          filename="semestra-vacation-plans.json"
+          exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
+          label={ <button type="button" name='downloadInput'>by clicking this handy button</button> }
+        />
+        <br/>
+        <label htmlFor='uploadInput'>Read from disk&nbsp;</label>
+        <input name='uploadInput' type='file' onChange={handleStateUpload} accept='application/json'>
+        </input>
+      </IOControls>
       <Year
         year={activeYear}
         holidays={holidays[`${activeYear}`][location]}
