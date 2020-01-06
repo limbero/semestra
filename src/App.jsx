@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import DownloadLink from "react-download-link";
 
 import holidays from './data/holidays';
 import vacation_allotment from './data/vacation_allotment';
@@ -216,6 +217,12 @@ function App() {
           ))
         }
       </Picker>
+      <DownloadLink
+        filename="semestra-vacation-plans.json"
+        exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
+      >
+        Save to disk
+      </DownloadLink>
       <Year
         year={activeYear}
         holidays={holidays[`${activeYear}`][location]}
