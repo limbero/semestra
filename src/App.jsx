@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import DownloadLink from "react-download-link";
+import DownloadLink from 'react-download-link';
+
+import { ReactComponent as DownloadIcon } from './icons/download.svg';
+import { ReactComponent as UploadIcon } from './icons/upload.svg';
 
 import holidays from './data/holidays';
 import vacation_allotment from './data/vacation_allotment';
@@ -9,6 +12,7 @@ import Spreads from './util/Spreads';
 
 import Year from './calendar/Year';
 import VacationMeter from './ui/VacationMeter';
+import CustomUploadButton from './ui/CustomUploadButton';
 
 
 const Wrapper = styled.div`
@@ -18,6 +22,11 @@ const Wrapper = styled.div`
   min-width: 600px;
   background-color: var(--background-color);
   color: var(--text-color);
+`;
+
+const Flex = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const IOControls = styled.div`
@@ -32,6 +41,48 @@ const Title = styled.h1`
 
 const Picker = styled.nav`
   margin: 20px 0;
+`;
+
+const SvgBtn = styled.button`
+  background: #EEE;
+  border: none;
+
+  stroke: #000;
+
+  padding: 5px 5px 0;
+  margin: 0 15px;
+
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--inactive);
+
+  border-radius: 3px;
+
+  &:disabled {
+    background-color: var(--text-color);
+    color: var(--background-color);
+  }
+
+  &:first-child {
+    margin-inline-start: 0;
+  }
+
+  &:last-child {
+    margin-inline-end: 0;
+  }
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+  }
+
+  &:not(:disabled):not(:active):not(:focus):hover {
+    stroke: #FD4;
+  }
+  &:active, &:focus {
+    outline: none;
+    stroke: #000;
+    background-color: #FD4;
+  }
 `;
 
 const PickerBtn = styled.button`
@@ -200,6 +251,10 @@ function App() {
   }
 
   function handleStateUpload(event) {
+    // User cancelled
+    if (!event.target.files[0]) {
+      return;
+    }
     let reader = new FileReader();
     reader.onerror = (error) => {
       alert(error);
@@ -226,27 +281,31 @@ function App() {
           ))
         }
       </Picker>
-      <Picker>
-        {
-          locations.map(loc => (
-            <PickerButton key={loc} value={loc} currentlyPicked={location} pick={setLocation}>
-              <img alt={loc} style={{display:'block'}} height={32} src={`/icons/${loc}.png`} />
-            </PickerButton>
-          ))
-        }
-      </Picker>
-      <IOControls>
-        <label htmlFor='downloadInput'>Save to disk&nbsp;</label>
-        <DownloadLink
-          filename="semestra-vacation-plans.json"
-          exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
-          label={ <button type="button" name='downloadInput'>by clicking this handy button</button> }
-        />
-        <br/>
-        <label htmlFor='uploadInput'>Read from disk&nbsp;</label>
-        <input name='uploadInput' type='file' onChange={handleStateUpload} accept='application/json'>
-        </input>
-      </IOControls>
+      <Flex>
+        <Picker>
+          {
+            locations.map(loc => (
+              <PickerButton key={loc} value={loc} currentlyPicked={location} pick={setLocation}>
+                <img alt={loc} style={{display:'block'}} height={32} src={`/icons/${loc}.png`} />
+              </PickerButton>
+            ))
+          }
+        </Picker>
+        <IOControls>
+          <CustomUploadButton onChange={handleStateUpload} name={"uploadButton"}>
+            <UploadIcon height="32" />
+          </CustomUploadButton>
+          <DownloadLink
+            filename="semestra-vacation-plans.json"
+            exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
+            label={
+              <SvgBtn type="button" name='downloadInput' alt="Download" title="Download">
+                <DownloadIcon height="32" />
+              </SvgBtn>
+            }
+          />
+        </IOControls>
+      </Flex>
       <Year
         year={activeYear}
         holidays={holidays[`${activeYear}`][location]}
