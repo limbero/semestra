@@ -38,7 +38,7 @@ const DayCell = styled.div`
   }
   p.holiday {
     margin: 5px 0 0 0;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--text-color-secondary);
     ${props => props.workedHoliday ? 'text-decoration: line-through;' : '' }
   }

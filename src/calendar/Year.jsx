@@ -7,6 +7,7 @@ import Measurements from '../util/Measurements';
 import Weekdays from './Weekdays';
 import Day from './Day';
 import Months from './Months';
+import WeekNumbers from './WeekNumbers';
 
 const YearGrid = styled.div`
   box-sizing: border-box;
@@ -25,6 +26,7 @@ const YearGrid = styled.div`
                           [friday]    3fr
                           [saturday]  3fr
                           [sunday]    3fr;
+                          [weeknos]   1fr;
 
   grid-gap: ${Measurements.year.padding}px;
   background-color: var(--year-background);
@@ -58,6 +60,7 @@ function Year(props) {
         })
       }
       <Months year={props.year} />
+      <WeekNumbers days={days} />
     </YearGrid>
   );
 }
