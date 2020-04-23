@@ -17,8 +17,8 @@ import CustomUploadButton from './ui/CustomUploadButton';
 
 const Wrapper = styled.div`
   margin: 0 auto;
-  width: 70vw;
-  max-width: 900px;
+  width: 80vw;
+  max-width: 1000px;
   min-width: 600px;
   background-color: var(--background-color);
   color: var(--text-color);
