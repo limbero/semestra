@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import DownloadLink from 'react-download-link';
+import React, { useState } from "react";
+import styled from "styled-components";
+import DownloadLink from "react-download-link";
 
-import { ReactComponent as DownloadIcon } from './icons/download.svg';
-import { ReactComponent as UploadIcon } from './icons/upload.svg';
+import { ReactComponent as DownloadIcon } from "./icons/download.svg";
+import { ReactComponent as UploadIcon } from "./icons/upload.svg";
 
-import holidays from './data/holidays';
-import vacation_allotment from './data/vacation_allotment';
+import holidays from "./data/holidays";
+import vacation_allotment from "./data/vacation_allotment";
 
-import Spreads from './util/Spreads';
+import Spreads from "./util/Spreads";
 
-import Year from './calendar/Year';
-import VacationMeter from './ui/VacationMeter';
-import CustomUploadButton from './ui/CustomUploadButton';
-
+import Year from "./calendar/Year";
+import VacationMeter from "./ui/VacationMeter";
+import CustomUploadButton from "./ui/CustomUploadButton";
 
 const Wrapper = styled.div`
   margin: 0 auto;
@@ -44,7 +43,7 @@ const Picker = styled.nav`
 `;
 
 const SvgBtn = styled.button`
-  background: #EEE;
+  background: #eee;
   border: none;
 
   stroke: #000;
@@ -76,12 +75,13 @@ const SvgBtn = styled.button`
   }
 
   &:not(:disabled):not(:active):not(:focus):hover {
-    stroke: #FD4;
+    stroke: #fd4;
   }
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
     stroke: #000;
-    background-color: #FD4;
+    background-color: #fd4;
   }
 `;
 
@@ -106,18 +106,19 @@ const PickerBtn = styled.button`
   &:first-child {
     margin-inline-start: 0;
   }
-  
+
   &:not(:disabled):not(:active):not(:focus):hover {
-    color: #FD4;
+    color: #fd4;
   }
-  
+
   &:not(:disabled):hover {
     cursor: pointer;
   }
-  &:active, &:focus {
+  &:active,
+  &:focus {
     outline: none;
     color: #000;
-    background-color: #FD4;
+    background-color: #fd4;
   }
 `;
 
@@ -132,13 +133,13 @@ function PickerButton(props) {
   );
 }
 
-const years = ['2019', '2020'];
-const locations = ['boston', 'uk', 'sweden'];
+const years = ["2019", "2020"];
+const locations = ["boston", "uk", "sweden", "nyc"];
 function yearsInLocs(thing) {
   const obj = {};
-  locations.forEach(loc => {
+  locations.forEach((loc) => {
     obj[loc] = {};
-    years.forEach(yr => {
+    years.forEach((yr) => {
       obj[loc][yr] = thing;
     });
   });
@@ -146,27 +147,29 @@ function yearsInLocs(thing) {
 }
 
 const schemaShapes = {
-  'semestra-year': 5,
-  'semestra-location': 'someplace',
-  'semestra-vacationAllotment': yearsInLocs(5),
-  'semestra-vacationDays': yearsInLocs([]),
-  'semestra-workedHolidays': yearsInLocs([]),
+  "semestra-year": 5,
+  "semestra-location": "someplace",
+  "semestra-vacationAllotment": yearsInLocs(5),
+  "semestra-vacationDays": yearsInLocs([]),
+  "semestra-workedHolidays": yearsInLocs([]),
 };
 
 function App() {
   const years = [2019, 2020];
-  const [activeYear, setYear] = useLocalStorage('semestra-year', 2019);
+  const [activeYear, setYear] = useLocalStorage("semestra-year", 2019);
 
-  const locations = ['boston', 'uk', 'sweden'];
-  const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
+  const [location, setLocation] = useLocalStorage(
+    "semestra-location",
+    "boston"
+  );
 
   function empty(filler) {
     const empty = {};
-    locations.forEach(loc => {
+    locations.forEach((loc) => {
       empty[loc] = {};
-      years.forEach(year => {
+      years.forEach((year) => {
         let val = filler;
-        if (typeof filler === 'function') {
+        if (typeof filler === "function") {
           val = filler(loc, year);
         }
         empty[loc][`${year}`] = val;
@@ -175,21 +178,28 @@ function App() {
     return empty;
   }
 
-  const [numVacationDays, setNumVacationDays] = useLocalStorage('semestra-vacationAllotment', empty((loc, yr) => vacation_allotment[loc]));
-  const [vacationDays, setVacationDays] = useLocalStorage('semestra-vacationDays', empty([]));
-  const [workedHolidays, setWorkedHolidays] = useLocalStorage('semestra-workedHolidays', empty([]));
+  const [numVacationDays, setNumVacationDays] = useLocalStorage(
+    "semestra-vacationAllotment",
+    empty((loc, yr) => vacation_allotment[loc])
+  );
+  const [vacationDays, setVacationDays] = useLocalStorage(
+    "semestra-vacationDays",
+    empty([])
+  );
+  const [workedHolidays, setWorkedHolidays] = useLocalStorage(
+    "semestra-workedHolidays",
+    empty([])
+  );
 
   function changeNumVacationDays(newNum) {
     if (thereAreDaysLeftOff(newNum) + 1) {
-      setNumVacationDays(
-        {
-          ...numVacationDays,
-          [location]: {
-            ...numVacationDays[location],
-            [activeYear]: newNum,
-          },
-        }
-      );
+      setNumVacationDays({
+        ...numVacationDays,
+        [location]: {
+          ...numVacationDays[location],
+          [activeYear]: newNum,
+        },
+      });
     }
   }
 
@@ -202,23 +212,43 @@ function App() {
   }
 
   function numVacationDaysLeft(from = numVacationDays[location][activeYear]) {
-    return from - vacationDays[location][activeYear].length + workedHolidays[location][activeYear].length;
+    return (
+      from -
+      vacationDays[location][activeYear].length +
+      workedHolidays[location][activeYear].length
+    );
   }
 
   function toggleDayOff(mmdd) {
     if (vacationDays[location][activeYear].includes(mmdd)) {
-      setVacationDaysHelper(Spreads.removeFromArray(vacationDays[location][activeYear], mmdd));
+      setVacationDaysHelper(
+        Spreads.removeFromArray(vacationDays[location][activeYear], mmdd)
+      );
     } else if (thereAreDaysLeftOff()) {
-      setVacationDaysHelper(Spreads.addToArray(vacationDays[location][activeYear], mmdd));
+      setVacationDaysHelper(
+        Spreads.addToArray(vacationDays[location][activeYear], mmdd)
+      );
     }
   }
 
   function setVacationDaysHelper(days) {
-    doFunctionForNestedState(vacationDays, setVacationDays, location, activeYear, days);
+    doFunctionForNestedState(
+      vacationDays,
+      setVacationDays,
+      location,
+      activeYear,
+      days
+    );
   }
 
   function setWorkedHolidaysHelper(days) {
-    doFunctionForNestedState(workedHolidays, setWorkedHolidays, location, activeYear, days);
+    doFunctionForNestedState(
+      workedHolidays,
+      setWorkedHolidays,
+      location,
+      activeYear,
+      days
+    );
   }
 
   function doFunctionForNestedState(obj, fun, loc, yr, days) {
@@ -233,19 +263,15 @@ function App() {
 
   function toggleWorkedHoliday(mmdd) {
     if (workedHolidays[location][activeYear].includes(mmdd)) {
-      if (!thereAreDaysLeftOff()) { return; }
+      if (!thereAreDaysLeftOff()) {
+        return;
+      }
       setWorkedHolidaysHelper(
-        Spreads.removeFromArray(
-          workedHolidays[location][activeYear],
-          mmdd
-        )
+        Spreads.removeFromArray(workedHolidays[location][activeYear], mmdd)
       );
     } else {
       setWorkedHolidaysHelper(
-        Spreads.addToArray(
-          workedHolidays[location][activeYear],
-          mmdd
-        )
+        Spreads.addToArray(workedHolidays[location][activeYear], mmdd)
       );
     }
   }
@@ -258,48 +284,79 @@ function App() {
     let reader = new FileReader();
     reader.onerror = (error) => {
       alert(error);
-    }
+    };
     reader.onload = (data) => {
       const uploadedState = JSON.parse(data.target.result);
       setNumVacationDays(uploadedState.numVacationDays);
       setVacationDays(uploadedState.vacationDays);
       setWorkedHolidays(uploadedState.workedHolidays);
-    }
+    };
     reader.readAsText(event.target.files[0]);
   }
-  
+
   return (
     <Wrapper>
       <Title>semestra</Title>
-      <div style={{ textAlign: 'right' }}>
-        <VacationMeter vacationDaysLeft={numVacationDaysLeft()} numVacationDays={numVacationDays[location][activeYear]} addNumVacationDays={addNumVacationDays} />
+      <div style={{ textAlign: "right" }}>
+        <VacationMeter
+          vacationDaysLeft={numVacationDaysLeft()}
+          numVacationDays={numVacationDays[location][activeYear]}
+          addNumVacationDays={addNumVacationDays}
+        />
       </div>
       <Picker>
-        {
-          years.map(year => (
-            <PickerButton key={year} value={year} currentlyPicked={activeYear} pick={setYear}>{year}</PickerButton>
-          ))
-        }
+        {years.map((year) => (
+          <PickerButton
+            key={year}
+            value={year}
+            currentlyPicked={activeYear}
+            pick={setYear}
+          >
+            {year}
+          </PickerButton>
+        ))}
       </Picker>
       <Flex>
         <Picker>
-          {
-            locations.map(loc => (
-              <PickerButton key={loc} value={loc} currentlyPicked={location} pick={setLocation}>
-                <img alt={loc} style={{display:'block'}} height={32} src={`/icons/${loc}.png`} />
-              </PickerButton>
-            ))
-          }
+          {locations.map((loc) => (
+            <PickerButton
+              key={loc}
+              value={loc}
+              currentlyPicked={location}
+              pick={setLocation}
+            >
+              <img
+                alt={loc}
+                style={{ display: "block" }}
+                height={32}
+                src={`/icons/${loc}.png`}
+              />
+            </PickerButton>
+          ))}
         </Picker>
         <IOControls>
-          <CustomUploadButton onChange={handleStateUpload} name={"uploadButton"}>
+          <CustomUploadButton
+            onChange={handleStateUpload}
+            name={"uploadButton"}
+          >
             <UploadIcon height="32" />
           </CustomUploadButton>
           <DownloadLink
             filename="semestra-vacation-plans.json"
-            exportFile={() => JSON.stringify({numVacationDays, vacationDays, workedHolidays}, null, 2)}
+            exportFile={() =>
+              JSON.stringify(
+                { numVacationDays, vacationDays, workedHolidays },
+                null,
+                2
+              )
+            }
             label={
-              <SvgBtn type="button" name='downloadInput' alt="Download" title="Download">
+              <SvgBtn
+                type="button"
+                name="downloadInput"
+                alt="Download"
+                title="Download"
+              >
                 <DownloadIcon height="32" />
               </SvgBtn>
             }
@@ -327,19 +384,19 @@ function shapeMatches(obj, match) {
     if (!Array.isArray(match)) {
       return false;
     }
-    for (let i=0; i < match.length; i++) {
+    for (let i = 0; i < match.length; i++) {
       if (!shapeMatches(obj[i], match[i])) {
         return false;
       }
     }
-  } else if (typeof obj === 'object') {
+  } else if (typeof obj === "object") {
     const oks = Object.keys(obj);
     const mks = Object.keys(obj);
 
     if (oks.length > mks.length) {
       return false;
     }
-    for (let k=0; k < oks.length; k++) {
+    for (let k = 0; k < oks.length; k++) {
       if (!mks.includes(oks[k])) {
         return false;
       } else {
@@ -372,7 +429,7 @@ function useLocalStorage(key, initialValue) {
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
-  const setValue = value => {
+  const setValue = (value) => {
     try {
       // Allow value to be a function so we have same API as useState
       const valueToStore =
