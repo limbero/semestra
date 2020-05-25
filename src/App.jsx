@@ -372,8 +372,8 @@ function App() {
         workedHolidays={workedHolidays[location][activeYear] || []}
       />
       <p>
-        Proudly by <a href="github.com/limbero">@limbero</a> with lots of help from{
-        } <a href="github.com/hughrawlinson">@hughrawlinson</a>.
+        Proudly by <a href="https://github.com/limbero">@limbero</a> with lots of help from{
+        } <a href="https://github.com/hughrawlinson">@hughrawlinson</a>.
       </p>
     </Wrapper>
   );
