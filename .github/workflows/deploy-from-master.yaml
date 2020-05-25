@@ -1,5 +1,4 @@
-- name: Deploy to GitHub Pages
-  uses: JamesIves/github-pages-deploy-action@3.5.3
+name: Deploy from master
 on:
   push:
     branches:
