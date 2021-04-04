@@ -52,7 +52,8 @@
       "11-11": "Veterans' Day",
       "11-28": "Thanksgiving Day",
       "12-25": "Christmas Day"
-    }
+    },
+    "netherlands": {}
   },
   "2020": {
     "boston": {
@@ -107,6 +108,40 @@
       "11-11": "Veterans' Day",
       "11-26": "Thanksgiving Day",
       "12-25": "Christmas Day"
+    },
+    "netherlands": {}
+  },
+  "2021": {
+    "boston": {},
+    "uk": {},
+    "sweden": {
+      "01-01": "Nyårsdagen",
+      "01-06": "Trettondedag jul",
+      "04-02": "Långfredagen",
+      "04-05": "Annandag påsk",
+      "05-01": "Första maj",
+      "05-13": "Kristi himmelsfärdsdag",
+      "06-06": "Nationaldagen",
+      "06-16": "Midsommarafton",
+      "12-24": "Julafton",
+      "12-25": "Juldagen",
+      "12-26": "Annandag jul",
+      "12-31": "Nyårsafton"
+
+    },
+    "nyc": {},
+    "netherlands": {
+      "01-01": "Nieuwjaarsdag",
+      "04-02": "Goede Vrijdag",
+      "04-04": "Eerste Paasdag",
+      "04-05": "Tweede Paasdag",
+      "04-27": "Koningsdag",
+      "05-05": "Bevrijdingsdag",
+      "05-13": "Hemelvaartsdag",
+      "05-23": "Eerste Pinksterdag",
+      "05-24": "Tweede Pinksterdag",
+      "12-25": "Eerste Kerstdag",
+      "12-26": "Tweede Kerstdag"
     }
   }
 }
