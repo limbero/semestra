@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import DownloadLink from "react-download-link";
 
-import { ReactComponent as DownloadIcon } from "./icons/download.svg";
-import { ReactComponent as UploadIcon } from "./icons/upload.svg";
+import { ReactComponent as DownloadIcon } from './icons/download.svg';
+import { ReactComponent as UploadIcon } from './icons/upload.svg';
 
 import holidays from "./data/holidays";
 import vacation_allotment from "./data/vacation_allotment";
@@ -133,8 +133,9 @@ function PickerButton(props) {
   );
 }
 
-const years = ["2019", "2020"];
-const locations = ["boston", "uk", "sweden", "nyc"];
+const years = ["2019", "2020", "2021"];
+const locations = ["boston", "uk", "sweden", "nyc", "netherlands"];
+
 function yearsInLocs(thing) {
   const obj = {};
   locations.forEach((loc) => {
@@ -155,13 +156,10 @@ const schemaShapes = {
 };
 
 function App() {
-  const years = [2019, 2020];
-  const [activeYear, setYear] = useLocalStorage("semestra-year", 2019);
+  const years = [2019, 2020, 2021];
+  const [activeYear, setYear] = useLocalStorage('semestra-year', 2021);
 
-  const [location, setLocation] = useLocalStorage(
-    "semestra-location",
-    "boston"
-  );
+  const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
 
   function empty(filler) {
     const empty = {};
