@@ -157,9 +157,8 @@ const schemaShapes = {
 
 function App() {
   const years = [2019, 2020, 2021];
-  const [activeYear, setYear] = useLocalStorage('semestra-year', 2019);
+  const [activeYear, setYear] = useLocalStorage('semestra-year', 2021);
 
-  const locations = ['boston', 'uk', 'sweden', 'nyc', 'netherlands'];
   const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
 
   function empty(filler) {
