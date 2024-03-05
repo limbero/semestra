@@ -22,8 +22,8 @@ const months = [
 const Month = styled.div`
   grid-column-start: months;
 
-  grid-row-start: ${props => props.startRow || 'auto'};
-  grid-row-end: span ${props => props.spanRows || '1'};
+  grid-row-start: ${props => props.$startRow || 'auto'};
+  grid-row-end: span ${props => props.$spanRows || '1'};
 
   box-sizing: border-box;
   padding: 5px;
@@ -34,7 +34,7 @@ const Month = styled.div`
 
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  letter-spacing: ${props => 30 * props.spanRows / props.month.length}px;
+  letter-spacing: ${props => 30 * props.$spanRows / props.$month.length}px;
   line-height: 100%;
 `;
 
@@ -67,9 +67,9 @@ function Months(props) {
           return (
             <Month
               key={month}
-              startRow={startRow}
-              spanRows={height}
-              month={month}
+              $startRow={startRow}
+              $spanRows={height}
+              $month={month}
             >
               {month}
             </Month>

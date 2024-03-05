@@ -6,7 +6,7 @@ import DateUtil from '../util/DateUtil';
 const WeekNumber = styled.div`
   grid-column-start: weeknos;
 
-  grid-row-start: ${props => props.startRow || 'auto'};
+  grid-row-start: ${props => props.$startRow || 'auto'};
   grid-row-end: span 1;
 
   box-sizing: border-box;
@@ -33,7 +33,7 @@ function WeekNumbers({days}) {
     <>
       {
         weekNumbers.map((weekNumber, index) => (
-          <WeekNumber key={index} startRow={index + 2}>
+          <WeekNumber key={index} $startRow={index + 2}>
             {weekNumber}
           </WeekNumber>
         ))

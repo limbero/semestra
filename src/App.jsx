@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import Select from 'react-select';
 import DownloadLink from "react-download-link";
 
-import { ReactComponent as DownloadIcon } from './icons/download.svg';
-import { ReactComponent as UploadIcon } from './icons/upload.svg';
+import DownloadIcon from './icons/download.svg?react';
+import UploadIcon from './icons/upload.svg?react';
 
 import holidays from "./data/holidays";
 import vacation_allotment from "./data/vacation_allotment";
@@ -13,6 +14,7 @@ import Spreads from "./util/Spreads";
 import Year from "./calendar/Year";
 import VacationMeter from "./ui/VacationMeter";
 import CustomUploadButton from "./ui/CustomUploadButton";
+import { getFlagEmoji } from "./util/Flags";
 
 const years = ["2019", "2020", "2021"];
 const locations = ["boston", "uk", "sweden", "nyc", "netherlands"];
@@ -41,6 +43,20 @@ function App() {
   const [activeYear, setYear] = useLocalStorage('semestra-year', 2021);
 
   const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
+
+  const [countries, setCountries] = useState([]);
+  const options = countries.map(country => ({
+    value: country.countryCode,
+    label: `${getFlagEmoji(country.countryCode)} ${country.name}`,
+  }));
+
+  console.log(options);
+
+  useEffect(() => {
+    fetch("https://date.nager.at/api/v3/AvailableCountries")
+      .then(res => res.json())
+      .then(countriesResponse => setCountries(countriesResponse))
+  }, [])
 
   function empty(filler) {
     const empty = {};
@@ -195,6 +211,9 @@ function App() {
           </PickerButton>
         ))}
       </Picker>
+      <div>
+        <Select options={options} />
+      </div>
       <Flex>
         <Picker>
           {locations.map((loc) => (

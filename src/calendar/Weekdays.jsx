@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import DateUtil from '../util/DateUtil';
 
 const Weekday = styled.div`
-  grid-column-start: ${props => props.weekday || 'auto'};
+  grid-column-start: ${props => props.$weekday || 'auto'};
   grid-column-end: span 1;
 
   box-sizing: border-box;
@@ -24,7 +24,7 @@ function Weekdays(props) {
         [...Array(7).keys()].map((index) => (
           <Weekday
             key={index}
-            weekday={DateUtil.weekdayName(index).toLowerCase()}
+            $weekday={DateUtil.weekdayName(index).toLowerCase()}
           >
             {DateUtil.weekdayName(index).slice(0, 3)}
           </Weekday>

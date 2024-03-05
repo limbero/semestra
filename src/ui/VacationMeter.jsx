@@ -26,7 +26,7 @@ const TextButton = styled.button`
 
   font-size: 1rem;
   font-weight: bold;
-  background-color: ${props => props.accentColor};
+  background-color: ${props => props.$accentColor};
   color: var(--background-color);
 
   border-radius: 3px;
@@ -49,7 +49,7 @@ const TextButton = styled.button`
   &:active, &:focus {
     outline: none;
     color: #000;
-    background-color: ${props => props.accentColor};
+    background-color: ${props => props.$accentColor};
   }
 `;
 
@@ -63,13 +63,13 @@ function VacationMeter(props) {
         <TextButton
           onClick={() => props.addNumVacationDays(-1)}
           disabled={props.vacationDaysLeft === 0}
-          accentColor={'var(--red)'}
+          $accentColor={'var(--red)'}
         >
           –
         </TextButton>
         <TextButton
           onClick={() => props.addNumVacationDays(1)}
-          accentColor={'var(--green)'}
+          $accentColor={'var(--green)'}
         >
           +
         </TextButton>

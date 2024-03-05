@@ -5,23 +5,23 @@ import DateUtil from '../util/DateUtil';
 import Measurements from '../util/Measurements';
 
 const DayCell = styled.div`
-  grid-column-start: ${props => props.weekday || 'auto'};
+  grid-column-start: ${props => props.$weekday || 'auto'};
   grid-column-end: span 1;
   background-color: ${props => {
-    if (props.workedHoliday) { return 'var(--arbetad-helgdag)'; }
-    else if (todayIsOff(props.weekday, props.holiday)) { return 'var(--helgdag)'; }
-    else if (props.vacationing) { return 'var(--semester)'; }
+    if (props.$workedHoliday) { return 'var(--arbetad-helgdag)'; }
+    else if (todayIsOff(props.$weekday, props.$holiday)) { return 'var(--helgdag)'; }
+    else if (props.$vacationing) { return 'var(--semester)'; }
     else { return 'var(--vardag)'; }
   }};
   ${props => {
-    if (props.month === 11) { return ''; }
-    if (props.date === DateUtil.lengthOfMonth(props.month, props.year) && props.weekday !== 'sunday') {
+    if (props.$month === 11) { return ''; }
+    if (props.$date === DateUtil.lengthOfMonth(props.$month, props.$year) && props.$weekday !== 'sunday') {
       return (
         `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider), ` +
         `${Measurements.year.padding*4}px 0 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
       );
     }
-    if (DateUtil.lengthOfMonth(props.month, props.year) - props.date < 7) {
+    if (DateUtil.lengthOfMonth(props.$month, props.$year) - props.$date < 7) {
       return (
         `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
       );
@@ -40,7 +40,7 @@ const DayCell = styled.div`
     margin: 5px 0 0 0;
     font-size: 0.7rem;
     color: var(--text-color-secondary);
-    ${props => props.workedHoliday ? 'text-decoration: line-through;' : '' }
+    ${props => props.$workedHoliday ? 'text-decoration: line-through;' : '' }
   }
 `;
 
@@ -68,14 +68,13 @@ function Day(props) {
   }
   return (
     <DayCell
-      weekday={weekday}
-      month={props.day.getUTCMonth()}
-      date={props.day.getUTCDate()}
-      year={props.day.getUTCFullYear()}
-      vacationing={props.vacationing}
-      workedHoliday={props.workedHoliday}
+      $weekday={weekday}
+      $month={props.day.getUTCMonth()}
+      $date={props.day.getUTCDate()}
+      $year={props.day.getUTCFullYear()}
+      $vacationing={props.vacationing}
+      $workedHoliday={props.workedHoliday}
       onClick={() => toggleToday()}
-      {...props}
     >
       <p className='date'>{props.day.getUTCDate()}</p>
       <p className='holiday'>{props.holiday}</p>
