@@ -14,125 +14,6 @@ import Year from "./calendar/Year";
 import VacationMeter from "./ui/VacationMeter";
 import CustomUploadButton from "./ui/CustomUploadButton";
 
-const Wrapper = styled.div`
-  margin: 0 auto;
-  width: 80vw;
-  max-width: 1000px;
-  min-width: 600px;
-  background-color: var(--background-color);
-  color: var(--text-color);
-`;
-
-const Flex = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const IOControls = styled.div`
-  margin: 20px 0;
-`;
-
-const Title = styled.h1`
-  font-family: monospace;
-  font-size: 4rem;
-  margin: 1rem 0;
-`;
-
-const Picker = styled.nav`
-  margin: 20px 0;
-`;
-
-const SvgBtn = styled.button`
-  background: #eee;
-  border: none;
-
-  stroke: #000;
-
-  padding: 5px 5px 0;
-  margin: 0 15px;
-
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--inactive);
-
-  border-radius: 3px;
-
-  &:disabled {
-    background-color: var(--text-color);
-    color: var(--background-color);
-  }
-
-  &:first-child {
-    margin-inline-start: 0;
-  }
-
-  &:last-child {
-    margin-inline-end: 0;
-  }
-
-  &:not(:disabled):hover {
-    cursor: pointer;
-  }
-
-  &:not(:disabled):not(:active):not(:focus):hover {
-    stroke: #fd4;
-  }
-  &:active,
-  &:focus {
-    outline: none;
-    stroke: #000;
-    background-color: #fd4;
-  }
-`;
-
-const PickerBtn = styled.button`
-  background: none;
-  border: none;
-
-  padding: 5px;
-  margin: 0 15px;
-
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--inactive);
-
-  border-radius: 3px;
-
-  &:disabled {
-    background-color: var(--text-color);
-    color: var(--background-color);
-  }
-
-  &:first-child {
-    margin-inline-start: 0;
-  }
-
-  &:not(:disabled):not(:active):not(:focus):hover {
-    color: #fd4;
-  }
-
-  &:not(:disabled):hover {
-    cursor: pointer;
-  }
-  &:active,
-  &:focus {
-    outline: none;
-    color: #000;
-    background-color: #fd4;
-  }
-`;
-
-function PickerButton(props) {
-  return (
-    <PickerBtn
-      disabled={props.value === props.currentlyPicked}
-      onClick={() => props.pick(props.value)}
-    >
-      {props.children}
-    </PickerBtn>
-  );
-}
-
 const years = ["2019", "2020", "2021"];
 const locations = ["boston", "uk", "sweden", "nyc", "netherlands"];
 
@@ -407,6 +288,126 @@ function shapeMatches(obj, match) {
     }
   }
   return true;
+}
+
+
+const Wrapper = styled.div`
+  margin: 0 auto;
+  width: 80vw;
+  max-width: 1000px;
+  min-width: 600px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+`;
+
+const Flex = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const IOControls = styled.div`
+  margin: 20px 0;
+`;
+
+const Title = styled.h1`
+  font-family: monospace;
+  font-size: 4rem;
+  margin: 1rem 0;
+`;
+
+const Picker = styled.nav`
+  margin: 20px 0;
+`;
+
+const SvgBtn = styled.button`
+  background: #eee;
+  border: none;
+
+  stroke: #000;
+
+  padding: 5px 5px 0;
+  margin: 0 15px;
+
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--inactive);
+
+  border-radius: 3px;
+
+  &:disabled {
+    background-color: var(--text-color);
+    color: var(--background-color);
+  }
+
+  &:first-child {
+    margin-inline-start: 0;
+  }
+
+  &:last-child {
+    margin-inline-end: 0;
+  }
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+  }
+
+  &:not(:disabled):not(:active):not(:focus):hover {
+    stroke: #fd4;
+  }
+  &:active,
+  &:focus {
+    outline: none;
+    stroke: #000;
+    background-color: #fd4;
+  }
+`;
+
+const PickerBtn = styled.button`
+  background: none;
+  border: none;
+
+  padding: 5px;
+  margin: 0 15px;
+
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--inactive);
+
+  border-radius: 3px;
+
+  &:disabled {
+    background-color: var(--text-color);
+    color: var(--background-color);
+  }
+
+  &:first-child {
+    margin-inline-start: 0;
+  }
+
+  &:not(:disabled):not(:active):not(:focus):hover {
+    color: #fd4;
+  }
+
+  &:not(:disabled):hover {
+    cursor: pointer;
+  }
+  &:active,
+  &:focus {
+    outline: none;
+    color: #000;
+    background-color: #fd4;
+  }
+`;
+
+function PickerButton(props) {
+  return (
+    <PickerBtn
+      disabled={props.value === props.currentlyPicked}
+      onClick={() => props.pick(props.value)}
+    >
+      {props.children}
+    </PickerBtn>
+  );
 }
 
 // Hook
