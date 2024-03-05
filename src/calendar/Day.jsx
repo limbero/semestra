@@ -74,6 +74,7 @@ function Day(props) {
       $year={props.day.getUTCFullYear()}
       $vacationing={props.vacationing}
       $workedHoliday={props.workedHoliday}
+      $holiday={props.holiday}
       onClick={() => toggleToday()}
     >
       <p className='date'>{props.day.getUTCDate()}</p>

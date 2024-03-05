@@ -6,8 +6,7 @@ import DownloadLink from "react-download-link";
 import DownloadIcon from './icons/download.svg?react';
 import UploadIcon from './icons/upload.svg?react';
 
-import holidays from "./data/holidays";
-import vacation_allotment from "./data/vacation_allotment";
+import countries_states from "./data/countries_states";
 
 import Spreads from "./util/Spreads";
 
@@ -16,112 +15,158 @@ import VacationMeter from "./ui/VacationMeter";
 import CustomUploadButton from "./ui/CustomUploadButton";
 import { getFlagEmoji } from "./util/Flags";
 
-const years = ["2019", "2020", "2021"];
-const locations = ["boston", "uk", "sweden", "nyc", "netherlands"];
-
-function yearsInLocs(thing) {
-  const obj = {};
-  locations.forEach((loc) => {
-    obj[loc] = {};
-    years.forEach((yr) => {
-      obj[loc][yr] = thing;
-    });
-  });
-  return obj;
-}
-
-const schemaShapes = {
-  "semestra-year": 5,
-  "semestra-location": "someplace",
-  "semestra-vacationAllotment": yearsInLocs(5),
-  "semestra-vacationDays": yearsInLocs([]),
-  "semestra-workedHolidays": yearsInLocs([]),
-};
+const thisYear = (new Date()).getFullYear();
+const textYears = [(thisYear - 1).toString(), thisYear.toString(), (thisYear + 1).toString()];
 
 function App() {
-  const years = [2019, 2020, 2021];
-  const [activeYear, setYear] = useLocalStorage('semestra-year', 2021);
-
-  const [location, setLocation] = useLocalStorage('semestra-location', 'boston');
+  const years = textYears.map(y => Number(y));
+  const [activeYear, setYear] = useLocalStorage('semestra-year', thisYear);
 
   const [countries, setCountries] = useState([]);
-  const options = countries.map(country => ({
+  const [country, setCountry] = useLocalStorage("semestra-country", "SE");
+  const [subdivision, setSubdivision] = useLocalStorage("semestra-subdivision", null);
+  const location = country + (subdivision ? `-${subdivision}` : "");
+
+  const [holidays, setHolidays] = useState([]);
+  let filteredHolidays = holidays.filter(holiday => holiday.global);
+
+  const countriesOptions = countries.map(country => ({
     value: country.countryCode,
     label: `${getFlagEmoji(country.countryCode)} ${country.name}`,
   }));
+  const preSelectedCountry = countriesOptions.find(option => option.value === country);
 
-  console.log(options);
+  const shouldShowSubdivisions = holidays.filter(holiday => holiday.global === false).length > 0;
+  let subdivisions = [];
+  let subdivisionsOptions = [];
+  let preSelectedSubdivision = null;
+  if (shouldShowSubdivisions) {
+    subdivisions = countries_states.find(cs => cs.iso2 === country).states;
+    if (country === "GB") {
+     subdivisions = subdivisions.filter(subdivision => ["England", "Northern Ireland", "Scotland", "Wales"].includes(subdivision.name));
+    }
+    subdivisionsOptions = subdivisions.map(subdivision => ({
+      value: subdivision.state_code,
+      label: subdivision.name,
+    }));
+    preSelectedSubdivision = subdivisionsOptions.find(option => option.value === subdivision);
+
+    if (subdivision) {
+      filteredHolidays = holidays.filter(holiday => {
+        return holiday.global || holiday.counties.includes(location);
+      });
+    }
+  }
+  const holidaysObject = {};
+  filteredHolidays.forEach(holiday => {
+    holidaysObject[holiday.date.slice(5)] = holiday.localName;
+  });
 
   useEffect(() => {
     fetch("https://date.nager.at/api/v3/AvailableCountries")
       .then(res => res.json())
-      .then(countriesResponse => setCountries(countriesResponse))
-  }, [])
+      .then(countriesResponse => setCountries(countriesResponse));
+  }, []);
 
-  function empty(filler) {
-    const empty = {};
-    locations.forEach((loc) => {
-      empty[loc] = {};
-      years.forEach((year) => {
-        let val = filler;
-        if (typeof filler === "function") {
-          val = filler(loc, year);
-        }
-        empty[loc][`${year}`] = val;
-      });
-    });
-    return empty;
-  }
+  useEffect(() => {
+    initializeNumVacationDays(activeYear, location, 25);
+    initializeVacationDays(activeYear, location);
+    initializeWorkedHolidays(activeYear, location);
+    fetch(`https://date.nager.at/api/v3/PublicHolidays/${activeYear}/${country}`)
+      .then(res => res.json())
+      .then(holidaysResponse => {
+        setHolidays(holidaysResponse);
+      })
+  }, [activeYear, location]);
 
   const [numVacationDays, setNumVacationDays] = useLocalStorage(
     "semestra-vacationAllotment",
-    empty((loc, yr) => vacation_allotment[loc])
+    {}
   );
   const [vacationDays, setVacationDays] = useLocalStorage(
     "semestra-vacationDays",
-    empty([])
+    {}
   );
   const [workedHolidays, setWorkedHolidays] = useLocalStorage(
     "semestra-workedHolidays",
-    empty([])
+    {}
   );
+
+  function initializeNumVacationDays(y, loc, n = 25) {
+    let tempNumVacationDays = {...numVacationDays};
+    if (!tempNumVacationDays?.[y]) {
+      tempNumVacationDays[y] = {
+        [loc]: n,
+      };
+    }
+    if (!tempNumVacationDays?.[y]?.[loc]) {
+      tempNumVacationDays[y][loc] = n;
+    }
+    setNumVacationDays(tempNumVacationDays);
+  }
+
+  function initializeVacationDays(y, loc) {
+    let tempVacationDays = {...vacationDays};
+    if (!tempVacationDays?.[y]) {
+      tempVacationDays[y] = {
+        [loc]: [],
+      };
+    }
+    if (!tempVacationDays?.[y]?.[loc]) {
+      tempVacationDays[y][loc] = [];
+    }
+    setVacationDays(tempVacationDays);
+  }
+
+  function initializeWorkedHolidays(y, loc) {
+    let tempWorkedHolidays = {...workedHolidays};
+    if (!tempWorkedHolidays?.[y]) {
+      tempWorkedHolidays[y] = {
+        [loc]: [],
+      };
+    }
+    if (!tempWorkedHolidays?.[y]?.[loc]) {
+      tempWorkedHolidays[y][loc] = [];
+    }
+    setWorkedHolidays(tempWorkedHolidays);
+  }
 
   function changeNumVacationDays(newNum) {
     if (thereAreDaysLeftOff(newNum) + 1) {
       setNumVacationDays({
         ...numVacationDays,
-        [location]: {
-          ...numVacationDays[location],
-          [activeYear]: newNum,
+        [activeYear]: {
+          ...numVacationDays[activeYear],
+          [location]: newNum,
         },
       });
     }
   }
 
   function addNumVacationDays(num) {
-    changeNumVacationDays(numVacationDays[location][activeYear] + num);
+    changeNumVacationDays(numVacationDays[activeYear][location] + num);
   }
 
-  function thereAreDaysLeftOff(from = numVacationDays[location][activeYear]) {
+  function thereAreDaysLeftOff(from = numVacationDays?.[activeYear]?.[location]) {
     return numVacationDaysLeft(from) > 0;
   }
 
-  function numVacationDaysLeft(from = numVacationDays[location][activeYear]) {
+  function numVacationDaysLeft(from = numVacationDays?.[activeYear]?.[location]) {
     return (
       from -
-      vacationDays[location][activeYear].length +
-      workedHolidays[location][activeYear].length
+      vacationDays?.[activeYear]?.[location].length +
+      workedHolidays?.[activeYear]?.[location].length
     );
   }
 
   function toggleDayOff(mmdd) {
-    if (vacationDays[location][activeYear].includes(mmdd)) {
+    if (vacationDays[activeYear][location].includes(mmdd)) {
       setVacationDaysHelper(
-        Spreads.removeFromArray(vacationDays[location][activeYear], mmdd)
+        Spreads.removeFromArray(vacationDays[activeYear][location], mmdd)
       );
     } else if (thereAreDaysLeftOff()) {
       setVacationDaysHelper(
-        Spreads.addToArray(vacationDays[location][activeYear], mmdd)
+        Spreads.addToArray(vacationDays[activeYear][location], mmdd)
       );
     }
   }
@@ -130,8 +175,8 @@ function App() {
     doFunctionForNestedState(
       vacationDays,
       setVacationDays,
-      location,
       activeYear,
+      location,
       days
     );
   }
@@ -140,33 +185,33 @@ function App() {
     doFunctionForNestedState(
       workedHolidays,
       setWorkedHolidays,
-      location,
       activeYear,
+      location,
       days
     );
   }
 
-  function doFunctionForNestedState(obj, fun, loc, yr, days) {
+  function doFunctionForNestedState(obj, fun, yr, loc, days) {
     fun({
       ...obj,
-      [loc]: {
-        ...obj[loc],
-        [yr]: days,
+      [yr]: {
+        ...obj[yr],
+        [loc]: days,
       },
     });
   }
 
   function toggleWorkedHoliday(mmdd) {
-    if (workedHolidays[location][activeYear].includes(mmdd)) {
+    if (workedHolidays[activeYear][location].includes(mmdd)) {
       if (!thereAreDaysLeftOff()) {
         return;
       }
       setWorkedHolidaysHelper(
-        Spreads.removeFromArray(workedHolidays[location][activeYear], mmdd)
+        Spreads.removeFromArray(workedHolidays[activeYear][location], mmdd)
       );
     } else {
       setWorkedHolidaysHelper(
-        Spreads.addToArray(workedHolidays[location][activeYear], mmdd)
+        Spreads.addToArray(workedHolidays[activeYear][location], mmdd)
       );
     }
   }
@@ -192,121 +237,95 @@ function App() {
   return (
     <Wrapper>
       <Title>semestra</Title>
-      <div style={{ textAlign: "right" }}>
-        <VacationMeter
-          vacationDaysLeft={numVacationDaysLeft()}
-          numVacationDays={numVacationDays[location][activeYear]}
-          addNumVacationDays={addNumVacationDays}
-        />
-      </div>
-      <Picker>
-        {years.map((year) => (
-          <PickerButton
-            key={year}
-            value={year}
-            currentlyPicked={activeYear}
-            pick={setYear}
-          >
-            {year}
-          </PickerButton>
-        ))}
-      </Picker>
-      <div>
-        <Select options={options} />
-      </div>
-      <Flex>
-        <Picker>
-          {locations.map((loc) => (
-            <PickerButton
-              key={loc}
-              value={loc}
-              currentlyPicked={location}
-              pick={setLocation}
-            >
-              <img
-                alt={loc}
-                style={{ display: "block" }}
-                height={32}
-                src={`/icons/${loc}.png`}
-              />
-            </PickerButton>
-          ))}
-        </Picker>
-        <IOControls>
-          <CustomUploadButton
-            onChange={handleStateUpload}
-            name={"uploadButton"}
-          >
-            <UploadIcon height="32" />
-          </CustomUploadButton>
-          <DownloadLink
-            filename="semestra-vacation-plans.json"
-            exportFile={() =>
-              JSON.stringify(
-                { numVacationDays, vacationDays, workedHolidays },
-                null,
-                2
-              )
-            }
-            label={
-              <SvgBtn
-                type="button"
-                name="downloadInput"
-                alt="Download"
-                title="Download"
+      {countries.length === 0 ? null : (
+        <>
+          <div style={{ textAlign: "right" }}>
+            <VacationMeter
+              vacationDaysLeft={numVacationDaysLeft()}
+              numVacationDays={numVacationDays?.[activeYear]?.[location]}
+              addNumVacationDays={addNumVacationDays}
+            />
+          </div>
+          <Picker>
+            {years.map((year) => (
+              <PickerButton
+                key={year}
+                value={year}
+                currentlyPicked={activeYear}
+                pick={setYear}
               >
-                <DownloadIcon height="32" />
-              </SvgBtn>
-            }
-          />
-        </IOControls>
-      </Flex>
-      <Year
-        year={activeYear}
-        holidays={holidays[`${activeYear}`][location]}
-        toggleDayOff={toggleDayOff}
-        toggleWorkedHoliday={toggleWorkedHoliday}
-        vacationDays={vacationDays[location][activeYear] || []}
-        workedHolidays={workedHolidays[location][activeYear] || []}
-      />
+                {year}
+              </PickerButton>
+            ))}
+          </Picker>
+          <Flex style={{ margin: "20px 0" }}>
+            <Flex style={{ width: "50%", color: "#000" }}>
+              <div style={{ width: "48%" }}>
+                <Select
+                  defaultValue={preSelectedCountry}
+                  onChange={(e) => { setCountry(e.value); setSubdivision(null); }}
+                  options={countriesOptions}
+                />
+              </div>
+              {
+                shouldShowSubdivisions ? (
+                  <div style={{ width: "48%" }}>
+                    <Select
+                      defaultValue={preSelectedSubdivision}
+                      onChange={(e) => { setSubdivision(e.value) }}
+                      options={subdivisionsOptions}
+                    />
+                  </div>
+                ) : null
+              }
+            </Flex>
+            <div>
+              <CustomUploadButton
+                onChange={handleStateUpload}
+                name={"uploadButton"}
+              >
+                <UploadIcon height="32" />
+              </CustomUploadButton>
+              <DownloadLink
+                filename="semestra-vacation-plans.json"
+                exportFile={() =>
+                  JSON.stringify(
+                    { numVacationDays, vacationDays, workedHolidays },
+                    null,
+                    2
+                  )
+                }
+                label={
+                  <SvgBtn
+                    type="button"
+                    name="downloadInput"
+                    alt="Download"
+                    title="Download"
+                  >
+                    <DownloadIcon height="32" />
+                  </SvgBtn>
+                }
+              />
+            </div>
+          </Flex>
+          {Object.keys(filteredHolidays).length === 0 ? null : (
+            <Year
+              year={activeYear}
+              holidays={holidaysObject}
+              toggleDayOff={toggleDayOff}
+              toggleWorkedHoliday={toggleWorkedHoliday}
+              vacationDays={vacationDays?.[activeYear]?.[location] || []}
+              workedHolidays={workedHolidays?.[activeYear]?.[location] || []}
+            />
+          )}
+        </>
+      )}
       <p>
         Proudly by <a href="https://github.com/limbero">@limbero</a> with lots of help from{
         } <a href="https://github.com/hughrawlinson">@hughrawlinson</a>.
       </p>
     </Wrapper>
   );
-}
-
-function shapeMatches(obj, match) {
-  if (!obj) {
-    return true;
-  } else if (typeof obj !== typeof match) {
-    return false;
-  } else if (Array.isArray(obj)) {
-    if (!Array.isArray(match)) {
-      return false;
-    }
-    for (let i = 0; i < match.length; i++) {
-      if (!shapeMatches(obj[i], match[i])) {
-        return false;
-      }
-    }
-  } else if (typeof obj === "object") {
-    const oks = Object.keys(obj);
-    const mks = Object.keys(obj);
-
-    if (oks.length > mks.length) {
-      return false;
-    }
-    for (let k = 0; k < oks.length; k++) {
-      if (!mks.includes(oks[k])) {
-        return false;
-      } else {
-        return shapeMatches(obj[oks[k]], match[mks[k]]);
-      }
-    }
-  }
-  return true;
 }
 
 
@@ -322,10 +341,6 @@ const Wrapper = styled.div`
 const Flex = styled.div`
   display: flex;
   justify-content: space-between;
-`;
-
-const IOControls = styled.div`
-  margin: 20px 0;
 `;
 
 const Title = styled.h1`
@@ -437,7 +452,7 @@ function useLocalStorage(key, initialValue) {
     try {
       // Get from local storage by key
       const item = JSON.parse(window.localStorage.getItem(key));
-      if (item && shapeMatches(item, schemaShapes[key])) {
+      if (item) {
         return item;
       } else {
         return initialValue;
