@@ -9,9 +9,12 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
-      - name: Bun Install and Build 🔧
+      - name: Use Bun 🔧
+        uses: oven-sh/setup-bun@v1
+      - name: Bun Install 🔧
         uses: oven-sh/setup-bun@v1
         run: bun install
+      - name: Bun Build 🔧
         run: bun run build
 
       - name: Upload artifact
