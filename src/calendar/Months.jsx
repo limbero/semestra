@@ -26,7 +26,8 @@ const Month = styled.div`
   grid-row-end: span ${props => props.$spanRows || '1'};
 
   box-sizing: border-box;
-  padding: 5px;
+  padding: 5px 0px 5px 10px;
+  margin: 0 auto;
 
   font-size: 2rem;
   text-align: center;

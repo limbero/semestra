@@ -14,6 +14,7 @@ const WeekNumber = styled.div`
 
   font-size: 1.35rem;
   text-align: center;
+  margin: 0 auto;
 
   display: flex;
   flex-direction: column;

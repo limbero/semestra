@@ -370,8 +370,10 @@ function App() {
 
 const Wrapper = styled.div`
   margin: 0 auto;
-  width: 80vw;
-  max-width: 1000px;
+  width: 100vw;
+  @media screen and (min-width: 1000px) {
+    width: 1000px;
+  }
   min-width: 600px;
   background-color: var(--background-color);
   color: var(--text-color);

@@ -33,6 +33,10 @@ const DayCell = styled.div`
   padding: 7px;
   border-radius: 5px;
 
+  overflow: hidden;
+  overflow-wrap: break-word;
+  hyphens: auto;
+
   p.date {
     margin: 0;
   }

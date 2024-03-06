@@ -12,6 +12,7 @@ const VacationMeterItem = styled.div`
 
   position: fixed;
   top: -4px;
+  width: 200px;
 
   box-shadow: 4px 4px 0 0 rgba(0,0,0, 0.3);
   transform: translateX(-100%);

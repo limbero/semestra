@@ -12,23 +12,23 @@ import WeekNumbers from './WeekNumbers';
 const YearGrid = styled.div`
   box-sizing: border-box;
   width: 100%;
-  padding: ${Measurements.year.padding}px ${Measurements.year.padding * 2}px ${Measurements.year.padding * 2}px ${Measurements.year.padding}px;
+  padding-top: ${Measurements.year.padding * 2}px;
   padding-bottom: ${Measurements.year.padding * 2}px;
   margin-bottom: ${Measurements.year.padding * 4}px;
 
   display: grid;
   grid-template-columns:  
-                          [months]    1fr
-                          [monday]    3fr
-                          [tuesday]   3fr
-                          [wednesday] 3fr
-                          [thursday]  3fr
-                          [friday]    3fr
-                          [saturday]  3fr
-                          [sunday]    3fr;
-                          [weeknos]   1fr;
+                          [months]    7.5%
+                          [monday]    11%
+                          [tuesday]   11%
+                          [wednesday] 11%
+                          [thursday]  11%
+                          [friday]    11%
+                          [saturday]  11%
+                          [sunday]    11%
+                          [weeknos]   7.5%;
 
-  grid-gap: ${Measurements.year.padding}px;
+  grid-gap: ${Measurements.year.padding}px 1%;
   background-color: var(--year-background);
   border-radius: ${Measurements.year.borderRadius}px;
 `;
