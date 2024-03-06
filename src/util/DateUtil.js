@@ -2,7 +2,7 @@ class DateUtil {
   static zeropad(num, len) {
     let numstr = String(num);
     while (numstr.length < len) {
-      numstr = `0${ numstr}`;
+      numstr = `0${numstr}`;
     }
     return numstr;
   }
@@ -13,10 +13,10 @@ class DateUtil {
     return this.dateStringYYYYMMDD(date) + separator + this.timeStringHHMM(date);
   }
   static utcDateTimeStringYYYYMMDDHHMM(date) {
-    return `${this.dateTimeStringYYYYMMDDHHMM(date, 'T') }Z`;
+    return `${this.dateTimeStringYYYYMMDDHHMM(date, 'T')}Z`;
   }
   static utcDateTimeStringYYYYMMDDHHMMSSMMM(date) {
-    return `${this.fullDateTimeString(date, 'T') }Z`;
+    return `${this.fullDateTimeString(date, 'T')}Z`;
   }
   static dateStringYYYYMMDD(date, separator = '-') {
     return date.getUTCFullYear() + separator + this.dateStringMMDD(date, separator);
@@ -82,11 +82,11 @@ class DateUtil {
     const d2 = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
     // Set to nearest Thursday: current date + 4 - current day number
     // Make Sunday's day number 7
-    d2.setUTCDate(d2.getUTCDate() + 4 - (d2.getUTCDay()||7));
+    d2.setUTCDate(d2.getUTCDate() + 4 - (d2.getUTCDay() || 7));
     // Get first day of year
-    const yearStart = new Date(Date.UTC(d2.getUTCFullYear(),0,1));
+    const yearStart = new Date(Date.UTC(d2.getUTCFullYear(), 0, 1));
     // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil(( ( (d2 - yearStart) / 86400000) + 1)/7);
+    var weekNo = Math.ceil((((d2 - yearStart) / 86400000) + 1) / 7);
     // Return array of year and week number
     return [d2.getUTCFullYear(), weekNo];
   }
@@ -104,12 +104,29 @@ class DateUtil {
     return weekdays[index];
   }
 
+  static months() {
+    return {
+      1: "January",
+      2: "February",
+      3: "March",
+      4: "April",
+      5: "May",
+      6: "June",
+      7: "July",
+      8: "August",
+      9: "September",
+      10: "October",
+      11: "November",
+      12: "December",
+    };
+  }
+
   static isLeapYear(year) {
     return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
   }
 
   static lengthOfMonth(month, year) {
-    let daysInMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+    let daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     if (this.isLeapYear(year)) {
       daysInMonth[1] = 29;
     }

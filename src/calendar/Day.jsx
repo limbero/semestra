@@ -14,16 +14,16 @@ const DayCell = styled.div`
     else { return 'var(--vardag)'; }
   }};
   ${props => {
-    if (props.$month === 11) { return ''; }
+    if (props.$month === (props.$startMonth - 2) || props.$month === (props.$startMonth + 10)) { return ''; }
     if (props.$date === DateUtil.lengthOfMonth(props.$month, props.$year) && props.$weekday !== 'sunday') {
       return (
-        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider), ` +
-        `${Measurements.year.padding*4}px 0 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
+        `box-shadow: 0 ${Measurements.year.padding * 4}px 0 -${Measurements.year.borderRadius * 5}px var(--month-divider), ` +
+        `${Measurements.year.padding * 4}px 0 0 -${Measurements.year.borderRadius * 5}px var(--month-divider);`
       );
     }
     if (DateUtil.lengthOfMonth(props.$month, props.$year) - props.$date < 7) {
       return (
-        `box-shadow: 0 ${Measurements.year.padding*4}px 0 -${Measurements.year.borderRadius*5}px var(--month-divider);`
+        `box-shadow: 0 ${Measurements.year.padding * 4}px 0 -${Measurements.year.borderRadius * 5}px var(--month-divider);`
       );
     }
   }}
@@ -40,7 +40,7 @@ const DayCell = styled.div`
     margin: 5px 0 0 0;
     font-size: 0.7rem;
     color: var(--text-color-secondary);
-    ${props => props.$workedHoliday ? 'text-decoration: line-through;' : '' }
+    ${props => props.$workedHoliday ? 'text-decoration: line-through;' : ''}
   }
 `;
 
@@ -54,16 +54,16 @@ function todayIsTheWeekend(weekday) {
 
 function Day(props) {
   const weekday = DateUtil.weekdayNameFromDate(props.day).toLowerCase();
-  const mmdd = DateUtil.dateStringMMDD(props.day);
+  const yyyymmdd = DateUtil.dateStringYYYYMMDD(props.day);
 
   function toggleToday() {
     if (todayIsTheWeekend(weekday)) {
       return false;
     } else if (props.holiday) {
-      
-      props.toggleWorkedHoliday(mmdd);
+
+      props.toggleWorkedHoliday(yyyymmdd);
     } else {
-      props.toggleDayOff(mmdd);
+      props.toggleDayOff(yyyymmdd);
     }
   }
   return (
@@ -75,6 +75,7 @@ function Day(props) {
       $vacationing={props.vacationing}
       $workedHoliday={props.workedHoliday}
       $holiday={props.holiday}
+      $startMonth={props.startMonth}
       onClick={() => toggleToday()}
     >
       <p className='date'>{props.day.getUTCDate()}</p>

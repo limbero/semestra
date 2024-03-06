@@ -13,14 +13,25 @@ import Spreads from "./util/Spreads";
 import Year from "./calendar/Year";
 import VacationMeter from "./ui/VacationMeter";
 import CustomUploadButton from "./ui/CustomUploadButton";
+import DateUtil from "./util/DateUtil";
 import { getFlagEmoji } from "./util/Flags";
 
 const thisYear = (new Date()).getFullYear();
-const textYears = [(thisYear - 1).toString(), thisYear.toString(), (thisYear + 1).toString()];
+const years = [(thisYear - 1), thisYear, (thisYear + 1)];
+const months = DateUtil.months();
+const monthsOptions = Object.entries(months).map(([monthNum, monthName]) => ({
+  value: monthNum,
+  label: monthName,
+}));
 
 function App() {
-  const years = textYears.map(y => Number(y));
+  const [startMonth, setStartMonth] = useLocalStorage('semestra-startmonth', 1);
+  const preSelectedMonth = monthsOptions[startMonth - 1];
+
   const [activeYear, setYear] = useLocalStorage('semestra-year', thisYear);
+  const textYears = startMonth === 1
+    ? years.map(year => year.toString())
+    : years.map(year => `${year.toString().slice(2)}/${(year + 1).toString().slice(2)}`);
 
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useLocalStorage("semestra-country", "SE");
@@ -43,7 +54,7 @@ function App() {
   if (shouldShowSubdivisions) {
     subdivisions = countries_states.find(cs => cs.iso2 === country).states;
     if (country === "GB") {
-     subdivisions = subdivisions.filter(subdivision => ["England", "Northern Ireland", "Scotland", "Wales"].includes(subdivision.name));
+      subdivisions = subdivisions.filter(subdivision => ["England", "Northern Ireland", "Scotland", "Wales"].includes(subdivision.name));
     }
     subdivisionsOptions = subdivisions.map(subdivision => ({
       value: subdivision.state_code,
@@ -59,7 +70,7 @@ function App() {
   }
   const holidaysObject = {};
   filteredHolidays.forEach(holiday => {
-    holidaysObject[holiday.date.slice(5)] = holiday.localName;
+    holidaysObject[holiday.date] = holiday.localName;
   });
 
   useEffect(() => {
@@ -72,10 +83,12 @@ function App() {
     initializeNumVacationDays(activeYear, location, 25);
     initializeVacationDays(activeYear, location);
     initializeWorkedHolidays(activeYear, location);
-    fetch(`https://date.nager.at/api/v3/PublicHolidays/${activeYear}/${country}`)
-      .then(res => res.json())
-      .then(holidaysResponse => {
-        setHolidays(holidaysResponse);
+
+    const thisYearsHolidays = fetch(`https://date.nager.at/api/v3/PublicHolidays/${activeYear}/${country}`).then(res => res.json());
+    const nextYearsHolidays = fetch(`https://date.nager.at/api/v3/PublicHolidays/${activeYear + 1}/${country}`).then(res => res.json());
+    Promise.all([thisYearsHolidays, nextYearsHolidays])
+      .then(holidaysResponses => {
+        setHolidays(holidaysResponses.flat());
       })
   }, [activeYear, location]);
 
@@ -93,7 +106,7 @@ function App() {
   );
 
   function initializeNumVacationDays(y, loc, n = 25) {
-    let tempNumVacationDays = {...numVacationDays};
+    let tempNumVacationDays = { ...numVacationDays };
     if (!tempNumVacationDays?.[y]) {
       tempNumVacationDays[y] = {
         [loc]: n,
@@ -106,27 +119,17 @@ function App() {
   }
 
   function initializeVacationDays(y, loc) {
-    let tempVacationDays = {...vacationDays};
-    if (!tempVacationDays?.[y]) {
-      tempVacationDays[y] = {
-        [loc]: [],
-      };
-    }
-    if (!tempVacationDays?.[y]?.[loc]) {
-      tempVacationDays[y][loc] = [];
+    let tempVacationDays = { ...vacationDays };
+    if (!tempVacationDays?.[loc]) {
+      tempVacationDays[loc] = [];
     }
     setVacationDays(tempVacationDays);
   }
 
   function initializeWorkedHolidays(y, loc) {
-    let tempWorkedHolidays = {...workedHolidays};
-    if (!tempWorkedHolidays?.[y]) {
-      tempWorkedHolidays[y] = {
-        [loc]: [],
-      };
-    }
-    if (!tempWorkedHolidays?.[y]?.[loc]) {
-      tempWorkedHolidays[y][loc] = [];
+    let tempWorkedHolidays = { ...workedHolidays };
+    if (!tempWorkedHolidays?.[loc]) {
+      tempWorkedHolidays[loc] = [];
     }
     setWorkedHolidays(tempWorkedHolidays);
   }
@@ -151,22 +154,53 @@ function App() {
     return numVacationDaysLeft(from) > 0;
   }
 
+  function getDaysForTwelveMonthSpan(days) {
+    let start = 0;
+    let startSet = false;
+    let stop = days.length;
+
+    const activeYearString = activeYear.toString();
+    const nextYearString = (activeYear + 1).toString();
+    const startMonthString = String(startMonth).padStart(2, "0");
+    for (let idx = 0; idx < days.length; idx++) {
+      if (
+        !startSet
+        && days[idx].slice(0, 4) === activeYearString
+        && days[idx].slice(5, 7) === startMonthString
+      ) {
+        startSet = true;
+        start = idx;
+      }
+      if (
+        days[idx].slice(0, 4) === nextYearString
+        && days[idx].slice(5, 7) === startMonthString
+      ) {
+        stop = idx;
+        break;
+      }
+    }
+    return days.slice(start, stop);
+  }
+
   function numVacationDaysLeft(from = numVacationDays?.[activeYear]?.[location]) {
+    const twelveMonthVacationDays = getDaysForTwelveMonthSpan(vacationDays?.[location]);
+    const twelveMonthWorkedHolidays = getDaysForTwelveMonthSpan(workedHolidays?.[location]);
+
     return (
       from -
-      vacationDays?.[activeYear]?.[location].length +
-      workedHolidays?.[activeYear]?.[location].length
+      twelveMonthVacationDays.length +
+      twelveMonthWorkedHolidays.length
     );
   }
 
-  function toggleDayOff(mmdd) {
-    if (vacationDays[activeYear][location].includes(mmdd)) {
+  function toggleDayOff(yyyymmdd) {
+    if (vacationDays[location].includes(yyyymmdd)) {
       setVacationDaysHelper(
-        Spreads.removeFromArray(vacationDays[activeYear][location], mmdd)
+        Spreads.removeFromArray(vacationDays[location], yyyymmdd).slice().sort()
       );
     } else if (thereAreDaysLeftOff()) {
       setVacationDaysHelper(
-        Spreads.addToArray(vacationDays[activeYear][location], mmdd)
+        Spreads.addToArray(vacationDays[location], yyyymmdd).slice().sort()
       );
     }
   }
@@ -175,7 +209,6 @@ function App() {
     doFunctionForNestedState(
       vacationDays,
       setVacationDays,
-      activeYear,
       location,
       days
     );
@@ -185,33 +218,29 @@ function App() {
     doFunctionForNestedState(
       workedHolidays,
       setWorkedHolidays,
-      activeYear,
       location,
       days
     );
   }
 
-  function doFunctionForNestedState(obj, fun, yr, loc, days) {
+  function doFunctionForNestedState(obj, fun, loc, days) {
     fun({
       ...obj,
-      [yr]: {
-        ...obj[yr],
-        [loc]: days,
-      },
+      [loc]: days,
     });
   }
 
-  function toggleWorkedHoliday(mmdd) {
-    if (workedHolidays[activeYear][location].includes(mmdd)) {
+  function toggleWorkedHoliday(yyyymmdd) {
+    if (workedHolidays[location].includes(yyyymmdd)) {
       if (!thereAreDaysLeftOff()) {
         return;
       }
       setWorkedHolidaysHelper(
-        Spreads.removeFromArray(workedHolidays[activeYear][location], mmdd)
+        Spreads.removeFromArray(workedHolidays[location], yyyymmdd)
       );
     } else {
       setWorkedHolidaysHelper(
-        Spreads.addToArray(workedHolidays[activeYear][location], mmdd)
+        Spreads.addToArray(workedHolidays[location], yyyymmdd)
       );
     }
   }
@@ -246,18 +275,27 @@ function App() {
               addNumVacationDays={addNumVacationDays}
             />
           </div>
-          <Picker>
-            {years.map((year) => (
-              <PickerButton
-                key={year}
-                value={year}
-                currentlyPicked={activeYear}
-                pick={setYear}
-              >
-                {year}
-              </PickerButton>
-            ))}
-          </Picker>
+          <Flex style={{ margin: "20px 0" }}>
+            <nav>
+              {years.map((year, ydx) => (
+                <PickerButton
+                  key={year}
+                  value={year}
+                  currentlyPicked={activeYear}
+                  pick={setYear}
+                >
+                  {textYears[ydx]}
+                </PickerButton>
+              ))}
+            </nav>
+            <div style={{ width: "25%", color: "#000" }}>
+              <Select
+                defaultValue={preSelectedMonth}
+                onChange={(e) => { setStartMonth(Number(e.value)); }}
+                options={monthsOptions}
+              />
+            </div>
+          </Flex>
           <Flex style={{ margin: "20px 0" }}>
             <Flex style={{ width: "50%", color: "#000" }}>
               <div style={{ width: "48%" }}>
@@ -311,11 +349,12 @@ function App() {
           {Object.keys(filteredHolidays).length === 0 ? null : (
             <Year
               year={activeYear}
+              startMonth={startMonth}
               holidays={holidaysObject}
               toggleDayOff={toggleDayOff}
               toggleWorkedHoliday={toggleWorkedHoliday}
-              vacationDays={vacationDays?.[activeYear]?.[location] || []}
-              workedHolidays={workedHolidays?.[activeYear]?.[location] || []}
+              vacationDays={vacationDays?.[location] || []}
+              workedHolidays={workedHolidays?.[location] || []}
             />
           )}
         </>
@@ -347,10 +386,6 @@ const Title = styled.h1`
   font-family: monospace;
   font-size: 4rem;
   margin: 1rem 0;
-`;
-
-const Picker = styled.nav`
-  margin: 20px 0;
 `;
 
 const SvgBtn = styled.button`

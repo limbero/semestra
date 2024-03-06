@@ -12,9 +12,9 @@ import WeekNumbers from './WeekNumbers';
 const YearGrid = styled.div`
   box-sizing: border-box;
   width: 100%;
-  padding: ${Measurements.year.padding}px ${Measurements.year.padding*2}px ${Measurements.year.padding*2}px ${Measurements.year.padding}px;
-  padding-bottom: ${Measurements.year.padding*2}px;
-  margin-bottom: ${Measurements.year.padding*4}px;
+  padding: ${Measurements.year.padding}px ${Measurements.year.padding * 2}px ${Measurements.year.padding * 2}px ${Measurements.year.padding}px;
+  padding-bottom: ${Measurements.year.padding * 2}px;
+  margin-bottom: ${Measurements.year.padding * 4}px;
 
   display: grid;
   grid-template-columns:  
@@ -34,32 +34,41 @@ const YearGrid = styled.div`
 `;
 
 function Year(props) {
-  const today = new Date(Date.UTC(props.year, 0, 1));
+  const today = new Date(Date.UTC(props.year, props.startMonth - 1, 1));
   const days = [];
-  while (today.getUTCFullYear() === props.year) {
+  let leftStartMonth = false;
+  while (true) {
+    if (leftStartMonth && today.getUTCMonth() === (props.startMonth - 1)) {
+      break;
+    }
     days.push(new Date(today.getTime()));
     today.setUTCDate(today.getUTCDate() + 1);
+    if (today.getUTCMonth() > (props.startMonth - 1)) {
+      leftStartMonth = true;
+    }
   }
-  
+
   return (
     <YearGrid>
       <Weekdays />
-      { 
+      {
         days.map(day => {
           const mmdd = DateUtil.dateStringMMDD(day);
+          const yyyymmdd = DateUtil.dateStringYYYYMMDD(day);
           return (
             <Day
-              key={DateUtil.dateStringYYYYMMDD(day)}
+              key={yyyymmdd}
               day={day}
-              holiday={props.holidays[mmdd] || ''}
-              vacationing={props.vacationDays.includes(mmdd)}
-              workedHoliday={props.workedHolidays.includes(mmdd)}
+              holiday={props.holidays[yyyymmdd] || ''}
+              vacationing={props.vacationDays.includes(yyyymmdd)}
+              workedHoliday={props.workedHolidays.includes(yyyymmdd)}
+              startMonth={props.startMonth}
               {...props}
             />
           );
         })
       }
-      <Months year={props.year} />
+      <Months year={props.year} startMonth={props.startMonth} />
       <WeekNumbers days={days} />
     </YearGrid>
   );

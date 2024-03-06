@@ -40,13 +40,14 @@ const Month = styled.div`
 
 function Months(props) {
   const today = new Date(Date.UTC(props.year, 0, 1));
+  const monthsRotated = [...months.slice(props.startMonth - 1), ...months.slice(0, props.startMonth - 1)]
 
   let monthStartsOn = DateUtil.weekdayFromDate(today);
   let lastRow = 2;
   return (
     <>
       {
-        months.map((month, index) => {
+        monthsRotated.map((month, index) => {
           let days = DateUtil.lengthOfMonth(index, props.year) + monthStartsOn;
           const startRow = lastRow;
           let height = 0;
@@ -55,7 +56,7 @@ function Months(props) {
             days -= 7;
             height++;
           }
-          
+
           monthStartsOn = days;
 
           lastRow = startRow + height;
