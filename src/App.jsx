@@ -155,6 +155,7 @@ function App() {
   }
 
   function getDaysForTwelveMonthSpan(days) {
+    console.log(days);
     let start = 0;
     let startSet = false;
     let stop = days.length;
@@ -183,8 +184,8 @@ function App() {
   }
 
   function numVacationDaysLeft(from = numVacationDays?.[activeYear]?.[location]) {
-    const twelveMonthVacationDays = getDaysForTwelveMonthSpan(vacationDays?.[location]);
-    const twelveMonthWorkedHolidays = getDaysForTwelveMonthSpan(workedHolidays?.[location]);
+    const twelveMonthVacationDays = getDaysForTwelveMonthSpan(vacationDays?.[location] || []);
+    const twelveMonthWorkedHolidays = getDaysForTwelveMonthSpan(workedHolidays?.[location] || []);
 
     return (
       from -
