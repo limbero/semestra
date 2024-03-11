@@ -294,6 +294,7 @@ function App() {
                 defaultValue={preSelectedMonth}
                 onChange={(e) => { setStartMonth(Number(e.value)); }}
                 options={monthsOptions}
+                styles={{ input: (baseStyles, state) => ({ ...baseStyles, fontSize: "16px" }) }}
               />
             </div>
           </Flex>
@@ -304,6 +305,7 @@ function App() {
                   defaultValue={preSelectedCountry}
                   onChange={(e) => { setCountry(e.value); setSubdivision(null); }}
                   options={countriesOptions}
+                  styles={{ input: (baseStyles, state) => ({ ...baseStyles, fontSize: "16px" }) }}
                 />
               </div>
               {
@@ -313,6 +315,7 @@ function App() {
                       defaultValue={preSelectedSubdivision}
                       onChange={(e) => { setSubdivision(e.value) }}
                       options={subdivisionsOptions}
+                      styles={{ input: (baseStyles, state) => ({ ...baseStyles, fontSize: "16px" }) }}
                     />
                   </div>
                 ) : null
